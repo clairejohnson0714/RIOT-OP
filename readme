@@ -1,0 +1,45 @@
+#how to use riot benchmark
+
+#scripts includes command to run riot benchmark
+#output is used for output program results.
+#module/tasks/src/main/resource includes all data or configuration file.
+
+# where is running log?
+# go to machine where running application. enter storm/logs/worker-aritifacts/
+
+# running TRAIN application, we need to configure PLUG to read cvs file.
+# running TRAIN application, need to configure microsoft Azure. 
+
+# PREDICT application, they didn't finish MOSQUITTO subscribe code. Need to finish. ~/storm/riot-bench/modules/tasks/src/main/java/in/dream_lab/bm/stream_iot/tasks/io/MQTTSubscribeTask.java 
+
+#install mysql, and MOSQUITTO
+sudo apt-get update
+sudo apt-get install mysql-server
+
+sudo systemctl start mysql
+sudo systemctl enable mysql
+/usr/bin/mysql -u root -p
+mysql> 
+create database demo; 
+use demo;
+CREATE TABLE stat (keyid VARCHAR(256), value MEDIUMBLOB);
+
+#install MOQUITTO
+sudo apt-get update
+sudo apt-get install mosquitto
+
+sudo mosquitto_passwd -c /etc/mosquitto/passwd demo
+Password: password
+#Create a configuration file for Mosquitto pointing to the password file we have just created.
+sudo vim /etc/mosquitto/conf.d/default.conf
+#This will open an empty file. Paste the following into it.
+
+allow_anonymous false
+password_file /etc/mosquitto/passwd
+
+#Now restart Mosquitto server and test our changes.
+
+sudo systemctl restart mosquitto
+
+# we can run PREDICT, ETL, STATISTIC application with SYS data and TAXI data.
+# check scripts directory.
