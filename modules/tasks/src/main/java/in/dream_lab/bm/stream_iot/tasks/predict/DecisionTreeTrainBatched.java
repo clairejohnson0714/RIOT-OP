@@ -30,7 +30,7 @@ public class DecisionTreeTrainBatched extends AbstractTask {
 	// static fields common to all threads
 	private static boolean doneSetup = false;
 	
-	private static String modelFilePath;
+	private static String modelFilePath = "";
 //	private static int modelTrainFreq;
 	private static String instanceHeader = null;
 	private static String SAMPLE_HEADER ="";
@@ -45,8 +45,7 @@ public class DecisionTreeTrainBatched extends AbstractTask {
 		super.setup(l_, p_);
 		synchronized (SETUP_LOCK) {
 			if(!doneSetup) { // Do setup only once for this task
-				modelFilePath = p_.getProperty("TRAIN.DECISION_TREE.MODEL_PATH");
-				String arffFilePath = p_.getProperty("CLASSIFICATION.DICISION_TREE.TRAIN.ARFF_PATH");
+				modelFilePath = p_.getProperty("RESOURCE.OUTPUT") + p_.getProperty("TRAIN.DECISION_TREE.MODEL_PATH");
 //	
 //				modelTrainFreq= Integer.parseInt(p_.getProperty("PREDICT.DECISION_TREE.TRAIN.MODEL_UPDATE_FREQUENCY"));
 					// converting arff file with header only to string
@@ -85,13 +84,12 @@ public class DecisionTreeTrainBatched extends AbstractTask {
 
 		String fullFilePath=modelFilePath+filename;  //  model file updated with MLR-endRowkey.model
 		int result = 0;
-		try {
-
+		try {			
 			instancesBuf.append("\n").append(m).append("\n");
 				// train and save model
 				//l.info("instancesBuf-"+instancesBuf.toString());
 			StringReader stringReader = new StringReader(instancesBuf.toString());
-			result = decisionTreeTrainAndSaveModel(stringReader, fullFilePath,model, l);
+			result = decisionTreeTrainAndSaveModel(stringReader, fullFilePath, model, l);
 
 			if(l.isInfoEnabled()) {
 				//l.info("Trained Model L.R.-{}", weka.core.SerializationHelper.read(fullFilePath).toString());

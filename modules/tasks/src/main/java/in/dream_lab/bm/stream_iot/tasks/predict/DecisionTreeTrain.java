@@ -39,8 +39,8 @@ public class DecisionTreeTrain extends AbstractTask {
 		super.setup(l_, p_);
 		synchronized (SETUP_LOCK) {
 			if(!doneSetup) { // Do setup only once for this task
-				modelFilePath = p_.getProperty("CLASSIFICATION.DECISION_TREE.MODEL_PATH");
-				String arffFilePath = p_.getProperty("CLASSIFICATION.DECISION_TREE.ARFF_PATH");
+				modelFilePath = p_.getProperty("RESOURCE.DIR") + p_.getProperty("CLASSIFICATION.DECISION_TREE.MODEL_PATH");
+				String arffFilePath = p_.getProperty("RESOURCE.DIR") + p_.getProperty("CLASSIFICATION.DECISION_TREE.ARFF_PATH");
 				modelTrainFreq = Integer.parseInt(p_.getProperty("CLASSIFICATION.DECISION_TREE.TRAIN.MODEL_UPDATE_FREQUENCY"));
 				try {
 					// converting arff file with header only to string

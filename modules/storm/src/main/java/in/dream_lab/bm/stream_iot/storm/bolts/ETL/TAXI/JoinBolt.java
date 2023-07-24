@@ -36,7 +36,7 @@ public class JoinBolt extends BaseRichBolt {
     {
          p=p_;
          maxCountPossible = Integer.parseInt(p_.getProperty("JOIN.MAX_COUNT_VALUE"));
-         schemaFieldOrderFilePath = p_.getProperty("JOIN.SCHEMA_FILE_PATH");
+         schemaFieldOrderFilePath = p_.getProperty("RESOURCE.DIR") + p_.getProperty("JOIN.SCHEMA_FILE_PATH");
          String metaField = p_.getProperty("JOIN.META_FIELD_SCHEMA");
          metaFields = metaField.split(",");
    

@@ -39,7 +39,7 @@ public class XMLParse extends AbstractTask {
 		super.setup(l_, p_);
 		synchronized (SETUP_LOCK) {
 			if(!doneSetup) { // Do setup only once for this task
-				String xmlFilePath = p_.getProperty("PARSE.XML_FILEPATH");
+				String xmlFilePath = p_.getProperty("RESOURCE.DIR") + p_.getProperty("PARSE.XML_FILEPATH");
 				try {
 					xmlFileAsString = readFileAsString(xmlFilePath, StandardCharsets.UTF_8);
 				} catch (IOException e) {

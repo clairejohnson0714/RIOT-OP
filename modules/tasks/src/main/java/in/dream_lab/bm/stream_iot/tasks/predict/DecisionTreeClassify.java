@@ -71,7 +71,7 @@ public class DecisionTreeClassify extends AbstractTask {
 			if(!doneSetup) { // Do setup only once for this task
 				// If positive, use actual tuple as input else SAMPLE_INPUT
 				useMsgField = Integer.parseInt(p_.getProperty("CLASSIFICATION.DECISION_TREE.USE_MSG_FIELD", "0")); 
-				String modelFilePath = p_.getProperty("CLASSIFICATION.DECISION_TREE.MODEL_PATH");
+				String modelFilePath = p_.getProperty("RESOURCE.DIR") + p_.getProperty("CLASSIFICATION.DECISION_TREE.MODEL_PATH");
 				// attribute index for getting the resulting enum
 				resultAttrNdx = Integer.parseInt(p_.getProperty("CLASSIFICATION.DECISION_TREE.CLASSIFY.RESULT_ATTRIBUTE_INDEX")); 
 				try {

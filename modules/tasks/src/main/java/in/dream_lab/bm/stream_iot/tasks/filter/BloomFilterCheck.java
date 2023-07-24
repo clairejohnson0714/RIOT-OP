@@ -34,7 +34,7 @@ public class BloomFilterCheck extends AbstractTask<String,Float> {
 				// If positive, use that particular field number in the input CSV message as input for count
 				useMsgField = Integer.parseInt(p_.getProperty("FILTER.BLOOM_FILTER_CHECK.USE_MSG_FIELD", "0")); 
 				System.out.println("use msg field value " + useMsgField);
-				bloomFilterFilePath=(p_.getProperty("FILTER.BLOOM_FILTER.MODEL_PATH"));
+				bloomFilterFilePath=(p_.getProperty("RESOURCE.DIR") + p_.getProperty("FILTER.BLOOM_FILTER.MODEL_PATH"));
 				int expectedInsertions = Integer.parseInt(p_.getProperty("FILTER.BLOOM_FILTER_TRAIN.EXPECTED_INSERTIONS", "20000000"));
 				
 				// autogenerate random values with range that is same as the number of insertions

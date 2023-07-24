@@ -5,3 +5,4 @@ modules/distribution/target
 *output
 *.log
 *data*
+.idea

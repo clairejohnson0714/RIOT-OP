@@ -57,7 +57,7 @@ public class SenMLParseBoltPREDSYS extends BaseRichBolt {
 				}
 				/* read csv schema to read fields observable into a list
 				 excluding meta fields read above */
-				FileReader 	reader = new FileReader(p.getProperty("PARSE.CSV_SCHEMA_FILEPATH"));
+				FileReader 	reader = new FileReader(p.getProperty("RESOURCE.DIR") + p.getProperty("PARSE.CSV_SCHEMA_FILEPATH"));
 				BufferedReader br = new BufferedReader(reader);
 				line = br.readLine();
 				String [] obsType = line.split(",");

@@ -40,7 +40,7 @@ public class Annotate extends AbstractTask<String,String>
 					// Check usefield 
 					useMsgField = Integer.parseInt(p_.getProperty("ANNOTATE.ANNOTATE_MSG_USE_FIELD", "0"));
 					// read file path for anotations
-					filePath = (p_.getProperty("ANNOTATE.ANNOTATE_FILE_PATH"));
+					filePath = (p_.getProperty("RESOURCE.DIR") + p_.getProperty("ANNOTATE.ANNOTATE_FILE_PATH"));
 				    // read file content 
 					FileReader reader = new FileReader(filePath); 
 					BufferedReader br = new BufferedReader(reader);

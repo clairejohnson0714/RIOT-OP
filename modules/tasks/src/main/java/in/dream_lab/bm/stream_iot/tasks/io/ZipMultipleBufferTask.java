@@ -45,7 +45,7 @@ public class ZipMultipleBufferTask extends AbstractTask<InputStream, String> {
 		synchronized (SETUP_LOCK) {
 			if (!doneSetup) { // TODO: Move proeprty names to IO namespace
 				maxfilecount = Integer.parseInt(p_.getProperty("IO.ZIPBUFFER.MAX_FILES_COUNT", "1"));
-				zipFilePath = p_.getProperty("IO.ZIPBUFFER.OUTPUT_ZIP_FILE_PATH");
+				zipFilePath = p_.getProperty("RESOURCE.OUTPUT") + p_.getProperty("IO.ZIPBUFFER.OUTPUT_ZIP_FILE_PATH");
 				filenamePattern = p_.getProperty("IO.ZIPBUFFER.FILENAME_PATTERN");				
 				filenameExt = p_.getProperty("IO.ZIPBUFFER.FILENAME_EXT"); // TODO: Add a FILE_EXT property
 				doneSetup = true;

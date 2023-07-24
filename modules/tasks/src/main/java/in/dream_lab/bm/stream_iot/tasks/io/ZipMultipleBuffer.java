@@ -38,7 +38,7 @@ public class ZipMultipleBuffer extends AbstractTask<InputStream, String> {
 		synchronized (SETUP_LOCK) {
 			if (!doneSetup) { // TODO: Move proeprty names to IO namespace
 				maxfilecount = Integer.parseInt(p_.getProperty("VISUALIZE.ZIP_FILES_COUNT", "1"));
-				zipFilePath = p_.getProperty("VISUALIZE.OUTPUT_ZIP_FILE_PATH");
+				zipFilePath = p_.getProperty("RESOURCE.OUTPUT") + p_.getProperty("VISUALIZE.OUTPUT_ZIP_FILE_PATH");
 				filenamePattern = p_.getProperty("VISUALIZE.PLOT_FILENAME_PATTERN");				
 				filenameExt = ".svg"; // TODO: Add a FILE_EXT property
 				ts = System.currentTimeMillis();

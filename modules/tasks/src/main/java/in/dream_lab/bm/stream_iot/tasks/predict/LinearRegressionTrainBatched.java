@@ -45,9 +45,7 @@ public class LinearRegressionTrainBatched extends AbstractTask {
 		super.setup(l_, p_);
 		synchronized (SETUP_LOCK) {
 			if(!doneSetup) { // Do setup only once for this task
-				modelFilePath = p_.getProperty("TRAIN.LINEAR_REGRESSION.MODEL_PATH");
-				String arffFilePath = p_.getProperty("LINEAR_REGRESSION.TRAIN.ARFF_PATH");
-
+				modelFilePath = p_.getProperty("RESOURCE.OUTPUT") + p_.getProperty("TRAIN.LINEAR_REGRESSION.MODEL_PATH");
 //				modelTrainFreq= Integer.parseInt(p_.getProperty("PREDICT.LINEAR_REGRESSION.TRAIN.MODEL_UPDATE_FREQUENCY"));
 
 				// converting arff file with header only to string

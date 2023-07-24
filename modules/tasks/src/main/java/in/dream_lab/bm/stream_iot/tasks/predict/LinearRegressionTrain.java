@@ -40,8 +40,8 @@ public class LinearRegressionTrain extends AbstractTask {
 		super.setup(l_, p_);
 		synchronized (SETUP_LOCK) {
 			if(!doneSetup) { // Do setup only once for this task
-				modelFilePath = p_.getProperty("PREDICT.LINEAR_REGRESSION.MODEL_PATH");
-				String arffFilePath = p_.getProperty("PREDICT.LINEAR_REGRESSION.TRAIN.ARFF_PATH");
+				modelFilePath = p_.getProperty("RESOURCE.DIR") + p_.getProperty("PREDICT.LINEAR_REGRESSION.MODEL_PATH");
+				String arffFilePath = p_.getProperty("RESOURCE.DIR") + p_.getProperty("PREDICT.LINEAR_REGRESSION.TRAIN.ARFF_PATH");
 				modelTrainFreq= Integer.parseInt(p_.getProperty("PREDICT.LINEAR_REGRESSION.TRAIN.MODEL_UPDATE_FREQUENCY"));
 				
 				try {

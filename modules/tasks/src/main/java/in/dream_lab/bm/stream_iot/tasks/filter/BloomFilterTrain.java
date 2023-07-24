@@ -47,7 +47,7 @@ public class BloomFilterTrain extends AbstractTask<String,Boolean> {
 
 				expectedInsertions = Integer.parseInt(p_.getProperty("FILTER.BLOOM_FILTER_TRAIN.EXPECTED_INSERTIONS", "20000000"));
 				falsePositiveRatio = Double.parseDouble(p_.getProperty("FILTER.BLOOM_FILTER_TRAIN.FALSEPOSITIVE_RATIO", "0.1"));
-				bloomFilterFilepath = (p_.getProperty("FILTER.BLOOM_FILTER.MODEL_PATH"));
+				bloomFilterFilepath = (p_.getProperty("RESOURCE.DIR") + p_.getProperty("FILTER.BLOOM_FILTER.MODEL_PATH"));
 				System.out.println("In set up "+bloomFilterFilepath);
 				// autogerate random values with range that is half as the number of insertions 
 				// so that each item has an insertion count of appox 2

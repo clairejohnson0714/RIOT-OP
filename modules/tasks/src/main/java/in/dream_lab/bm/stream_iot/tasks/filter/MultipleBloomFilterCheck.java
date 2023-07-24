@@ -39,7 +39,7 @@ public class MultipleBloomFilterCheck extends AbstractTask<String,Float> {
 				{
 					// If positive, use that particular field number in the input CSV message as input for count
 					String useMsgList =p_.getProperty("FILTER.MULTI_BLOOM_FILTER.USE_MSG_FIELD_LIST"); 
-					bloomFilterFilePaths=(p_.getProperty("FILTER.MULTI_BLOOM_FILTER.MODEL_PATH_LIST")); // FIXME: ensure props file are updated
+					bloomFilterFilePaths=(p_.getProperty("RESOURCE.DIR") + p_.getProperty("FILTER.MULTI_BLOOM_FILTER.MODEL_PATH_LIST")); // FIXME: ensure props file are updated
 					int expectedInsertions = Integer.parseInt(p_.getProperty("FILTER.BLOOM_FILTER_TRAIN.EXPECTED_INSERTIONS", "20000000"));
 
 					useMsgFieldList = useMsgList.split(",");

@@ -45,7 +45,7 @@ public class CsvToSenMLParse extends AbstractTask<String,String>
 		{
 		if(!doneSetup) 
 		{ 
-			String schemaFilePath = p_.getProperty("PARSE.CSV_SCHEMA_WITH_ANNOTATEDFIELDS_FILEPATH");
+			String schemaFilePath = p_.getProperty("RESOURCE.DIR") + p_.getProperty("PARSE.CSV_SCHEMA_WITH_ANNOTATEDFIELDS_FILEPATH");
 			useMsgField =Integer.parseInt(p_.getProperty("PARSE.CSV_SENML_USE_MSG_FIELD"));
 			try 
 			{

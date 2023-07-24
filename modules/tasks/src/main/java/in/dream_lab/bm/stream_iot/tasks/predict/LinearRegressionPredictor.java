@@ -69,7 +69,7 @@ public class LinearRegressionPredictor extends AbstractTask<String,Float> {
 				// dummyInputConst
 				useMsgField = Integer.parseInt(p_.getProperty("PREDICT.LINEAR_REGRESSION.USE_MSG_FIELD", "0"));
 
-				modelFilePath = p_.getProperty("PREDICT.LINEAR_REGRESSION.MODEL_PATH");
+				modelFilePath = p_.getProperty("RESOURCE.DIR") + p_.getProperty("PREDICT.LINEAR_REGRESSION.MODEL_PATH");
 				try {
 					lr = (LinearRegression) weka.core.SerializationHelper.read(modelFilePath);
 
