@@ -4,5 +4,5 @@ modules/distribution/target
 *__pycache__*
 *output
 *.log
-*data*
+python_experiment/data
 .idea
