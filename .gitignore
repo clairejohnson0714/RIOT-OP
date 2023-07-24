@@ -2,7 +2,10 @@ modules/storm/target
 modules/tasks/target
 modules/distribution/target
 *__pycache__*
-*output
+output/sink*
+output/skopt*
+output/spout*
 *.log
 python_experiment/data
 .idea
+output/iot-summer-school/*.model
