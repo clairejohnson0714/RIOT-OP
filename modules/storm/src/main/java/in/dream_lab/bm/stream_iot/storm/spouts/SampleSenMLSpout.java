@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.ArrayList;
+import java.util.logging.*;
 
 public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGen {
 	SpoutOutputCollector _collector;
@@ -37,6 +39,9 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 	int p1=0;
 	int p=0;
 	String priority[];
+
+    private static Logger l = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+
 	public SampleSenMLSpout(){
 		//			this.csvFileName = "/home/ubuntu/sample100_sense.csv";
 		//			System.out.println("Inside  sample spout code");
@@ -50,21 +55,25 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 		this.outSpoutCSVLogFileName = outSpoutCSVLogFileName;
 		this.scalingFactor = scalingFactor;
 		this.experiRunId = experiRunId;
-
 	}
 
 	public SampleSenMLSpout(String csvFileName, String outSpoutCSVLogFileName, double scalingFactor){
 		this(csvFileName, outSpoutCSVLogFileName, scalingFactor, "");
 	}
-	Values[] values3;
-	Values[] values2;
-	Values[] values1;
+	//Values values3[];
+	//Values  values2[];
+	//Values  values1[];
+
 
 	@Override
 	public void nextTuple() 
 	{
+		ArrayList<Values> values1 = new ArrayList<Values>();
+		ArrayList<Values> values2 = new ArrayList<Values>();
+		ArrayList<Values> values3 = new ArrayList<Values>();
+		Values value ;
 
-		int i=-1, j=-1, k=-1;
+		int i=-1;
 		int count = 0, MAX_COUNT=10; // FIXME?
 		while(count < MAX_COUNT) 
 		{
@@ -72,9 +81,12 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 			if(entry == null) return;
 			count++;
 			msgId++;
+
+			if (p1 == 1000) 
+				p1 = 0;		
 			try 
 			{
-				ba.batchLogwriter(System.currentTimeMillis(),"MSGID," + msgId);
+				ba.batchLogwriter(System.currentTimeMillis(),"MSGID," + msgId, priority[p1]);
 				//jr.batchWriter(System.currentTimeMillis(),"MSGID_" + msgId);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -87,34 +99,39 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 			String newRow = rowString.substring(rowString.indexOf(",")+1);
 			int a = Integer.parseInt(priority[p1]);
 			p1++;
+		
 			if(a==3){
-				i++;
-				values3[i].add(Long.toString(msgId));
-				values3[i].add(newRow);
+				value = new Values();
+				value.add(Long.toString(msgId));
+				value.add(newRow);
+
+				values3.add(value);
 			}
-			if(a=='2'){
-				j++;
-				values2[j].add(Long.toString(msgId));
-				values2[j].add(newRow);
+			if(a==2){
+				value = new Values();
+				value.add(Long.toString(msgId));
+				value.add(newRow);
+				
+				values2.add(value);
 			}
-			if(a=='1'){
-				k++;
-				values1[k].add(Long.toString(msgId));
-				values1[k].add(newRow);
+			if(a==1){
+				value = new Values();
+				value.add(Long.toString(msgId));
+				value.add(newRow);
+				
+				values1.add(value);
 			}
 		}
-		while (i!=-1){
-			this._collector.emit(values3[i]);
-			i--;
-		}
-		while(j!=-1){
-			this._collector.emit(values2[j]);
-			j--;
-		}
-		while(k!=-1){
-			this._collector.emit(values1[k]);
-			k--;
-		}	
+		for (i = 0; i < values1.size(); i++) {
+            this._collector.emit(values1.get(i));
+        }
+		for (i = 0; i < values2.size(); i++) {
+            this._collector.emit(values2.get(i));
+        }
+		for (i = 0; i < values3.size(); i++) {
+            this._collector.emit(values3.get(i));
+        }
+
 	}
 
 	@Override
@@ -138,21 +155,25 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 
 		ba=new BatchedFileLogging(uLogfilename, context.getThisComponentId());
 		//jr=new JRedis(this.outSpoutCSVLogFileName);
+ 		priority = new String[1005];
+		p = 0;
 		try 
 		{
-			FileReader reader = new FileReader("/home/amna/riot-bench-master/modules/tasks/src/main/resources/priority_sys.csv");
+			FileReader reader = new FileReader("/home/cc/storm/riot-bench/modules/tasks/src/main/resources/priority_sys.txt");
 			BufferedReader br = new BufferedReader(reader);
-			while ((br.readLine()) != null)   //returns a Boolean value  
+			String line = br.readLine();
+			while (line != null)   //returns a Boolean value  
 			{  
-				line = br.readLine();
-				System.out.printf("data "+ line);
-				priority[p]=line;
+				priority[p]=line.replace("\n", "");
 				p++;
+				line = br.readLine();
 			} 
+			br.close();
+
 		}   
 		catch(Exception e)
 	 	{
-		  
+			e.printStackTrace();
 	  	}
 
 
