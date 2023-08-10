@@ -155,7 +155,6 @@ public class BatchedFileLogging  {
             e.printStackTrace();
         }
     }
-
     public void batchLogwriter(long ts,String identifierData) throws Exception
     {
         if (counter<this.threshold)
@@ -189,7 +188,7 @@ public class BatchedFileLogging  {
             for(TupleType tp : batch){
                 //this.out.write( this.logStringPrefix + "," + tp.ts + "," + tp.identifier + "\n");
                 this.out.write( tp.ts + "," + tp.identifier + "\n");
-
+                
             }
             this.out.flush();
 
@@ -199,6 +198,105 @@ public class BatchedFileLogging  {
             batch.add(new TupleType(ts, identifierData));
         }
     }
+    public void batchLogwriter(long ts,String identifierData, String priority) throws Exception
+    {
+        if (counter<this.threshold)
+        {
+            //System.out.print("data is inside hashmap");
+//            batch.put(ts,identifierData);
+            batch.add(new TupleType(ts, identifierData, priority));
+            counter += 1;
+        }
+        else
+        {
+            //1-write Map to file
+//            Iterator<Map.Entry<Long, String>> it = batch.entrySet().iterator();
+//            while (it.hasNext() )
+//            {
+//                // the key/value pair is stored here in pairs
+//                Map.Entry<Long, String> pairs = it.next();
+//                //System.out.println("Value is " + pairs.getValue());
+//
+//                this.out.write( this.logStringPrefix + "," + pairs.getKey() + "," + pairs.getValue() + "\n");
+//            }
+//            System.out.print("data is written to file");
+//            this.out.flush();
+//
+//            //2-flush all data from map
+//            batch.clear();
+//
+//            //3-insert new tuple to map
+//            counter=1;
+//            batch.put(ts,identifierData);
+            for(TupleType tp : batch){
+                //this.out.write( this.logStringPrefix + "," + tp.ts + "," + tp.identifier + "\n");
+                this.out.write( tp.ts + "," + tp.identifier + "," + tp.priority + "\n");
+                
+            }
+            this.out.flush();
+
+            batch.clear();
+
+            counter = 1 ;
+            batch.add(new TupleType(ts, identifierData));
+        }
+    }
+
+//   public  void batchLogwriter(long ts,String tuple) throws Exception
+//    {System.out.println("CALLED");
+//        if (counter<this.threshold)
+//        {
+//            System.out.print("data is inside hashmap");
+//            batch.put(ts,tuple);
+//            counter += 1;
+//        }
+//        else
+//        {
+//            //1-write Map to file
+//
+//            // create your filewriter and bufferedreader
+////            fstream = new FileWriter("/home/ubuntu/values.csv",true);
+//
+//            Iterator<Map.Entry<Long, String>> it = batch.entrySet().iterator();
+//            while (it.hasNext() )
+//            {
+//                // the key/value pair is stored here in pairs
+//                Map.Entry<Long, String> pairs = it.next();
+//                System.out.println("Value is " + pairs.getValue());
+//
+////                out.write("Timestamp :"+ pairs.getKey()+"\t value is : "+pairs.getValue() + "\n");
+//                this.out.write( pairs.getKey()+","+pairs.getValue() + "\n");
+////                out.write(pairs.getKey()+);
+//            }
+//            System.out.print("data is written to file");
+//            this.out.flush();
+//
+//            //2-flush all data from map
+//            batch.clear();
+//
+//            //3-insert new tuple to map
+//            counter=1;
+//            batch.put(ts,tuple);
+//        }
+//    }
+
+
+
+
+
+//    public static void main(Strings args[])
+//     {
+//        BatchedFileLogging ba=new BatchedFileLogging();
+//        for(int i=0;i<100;i++)
+//            try {
+//                ba.batchLogwriter(i,"entry isndoe file");
+//            } catch (Exception e) {
+//
+//                System.out.println("Inside the Exception");
+//                e.printStackTrace();
+//            }
+//         System.out.println("Inside the Exception");
+//    }
 
 
 //TEMP  LOGIC
