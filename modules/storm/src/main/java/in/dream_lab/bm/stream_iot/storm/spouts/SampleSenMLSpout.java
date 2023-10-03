@@ -87,7 +87,7 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 			try 
 			{
 				ba.batchLogwriter(System.currentTimeMillis(),"MSGID," + msgId, priority[p1]);
-				//jr.batchWriter(System.currentTimeMillis(),"MSGID_" + msgId);
+				jr.batchWriter(System.currentTimeMillis(),"MSGID_" + msgId,priority[p1]);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -154,7 +154,7 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 		this.eventGen.launch(this.csvFileName, uLogfilename, -1, true); //Launch threads
 
 		ba=new BatchedFileLogging(uLogfilename, context.getThisComponentId());
-		//jr=new JRedis(this.outSpoutCSVLogFileName);
+		jr=new JRedis(this.outSpoutCSVLogFileName);
  		priority = new String[1005];
 		p = 0;
 		try 

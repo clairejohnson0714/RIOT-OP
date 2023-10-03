@@ -73,3 +73,7 @@ Please refer the paper for detailed info  - <https://arxiv.org/abs/1701.08530>
 This article is an extended version of:
 - Benchmarking Distributed Stream Processing Platforms for IoT Applications, Anshu Shukla and Yogesh Simmhan, _TPC Technology Conference on Performance Evaluation & Benchmarking (TPCTC)_, 2016.
 
+
+# Environment
+# install, zookeeper, mqtt, redis, mvn, apache storm.
+

@@ -128,6 +128,7 @@ public class BatchedFileLogging  {
     int counter=0;
 //    Map<Long,String> batch=new HashMap<Long,String>();
     List<TupleType> batch = new ArrayList<TupleType>();
+    List<TupleType1> batch1 = new ArrayList<TupleType1>();
     FileWriter fstream;
     BufferedWriter out;
     String csvFileNameOut;
@@ -204,7 +205,7 @@ public class BatchedFileLogging  {
         {
             //System.out.print("data is inside hashmap");
 //            batch.put(ts,identifierData);
-            batch.add(new TupleType(ts, identifierData, priority));
+            batch1.add(new TupleType1(ts, identifierData, priority));
             counter += 1;
         }
         else
@@ -228,17 +229,17 @@ public class BatchedFileLogging  {
 //            //3-insert new tuple to map
 //            counter=1;
 //            batch.put(ts,identifierData);
-            for(TupleType tp : batch){
+            for(TupleType1 tp : batch1){
                 //this.out.write( this.logStringPrefix + "," + tp.ts + "," + tp.identifier + "\n");
                 this.out.write( tp.ts + "," + tp.identifier + "," + tp.priority + "\n");
                 
             }
             this.out.flush();
 
-            batch.clear();
+            batch1.clear();
 
             counter = 1 ;
-            batch.add(new TupleType(ts, identifierData));
+            batch1.add(new TupleType1(ts, identifierData, priority));
         }
     }
 
@@ -366,9 +367,19 @@ public class BatchedFileLogging  {
         System.out.println("TEMP LOGIC Done");
 
     }
-    //
-
+    public static void main(String args[])
+     {
+//        BatchedFileLogging ba=new BatchedFileLogging();
+//        for(int i=0;i<100;i++)
+//            try {
+//                ba.batchLogwriter(i,"entry isndoe file");
+//            } catch (Exception e) {
 //
+//                System.out.println("Inside the Exception");
+//                e.printStackTrace();
+//            }
+//         System.out.println("Inside the Exception");
+    }
 
 }
 
@@ -380,5 +391,16 @@ class TupleType{
     public TupleType(long ts, String identifier){
         this.ts = ts;
         this.identifier = identifier;
+    }
+}
+class TupleType1{
+    long ts;
+    String identifier;
+    String priority;
+
+    public TupleType1(long ts, String identifier, String priority){
+        this.ts = ts;
+        this.identifier = identifier;
+        this.priority = priority;
     }
 }
