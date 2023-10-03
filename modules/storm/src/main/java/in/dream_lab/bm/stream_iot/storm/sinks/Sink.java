@@ -43,16 +43,16 @@ public class Sink extends BaseRichBolt {
     @Override
     public void execute(Tuple input) {
         String msgId = input.getStringByField("MSGID");
-//        String exe_time = input.getStringByField("time");  //addon
+        //String exe_time = input.getStringByField("time");  //addon
         //collector.emit(input,new Values(msgId));
         long ts = System.currentTimeMillis();
         try {
         	ba.batchLogwriter(System.currentTimeMillis(),msgId);
-            //if (Long.parseLong(msgId) % 10 == 0)
-	    //	        jr.batchWriter(System.currentTimeMillis(), msgId);
-		// if (Long.parseLong(msgId) % 20 == 0)
-         //		jr.batchWriter(ts, msgId);
-          //   ba.batchLogwriter(System.currentTimeMillis(),msgId+","+exe_time);//addon
+           if (Long.parseLong(msgId) % 10 == 0)
+	    	        jr.batchWriter(System.currentTimeMillis(), msgId);
+		 if (Long.parseLong(msgId) % 20 == 0)
+         		jr.batchWriter(ts, msgId);
+            //ba.batchLogwriter(System.currentTimeMillis(),msgId+","+exe_time);//addon
         } catch (Exception e) {
             e.printStackTrace();
         }
