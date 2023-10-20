@@ -92,7 +92,7 @@ public class JRedis{
                 	//p.set(this.appName + "_"+tp.ts + "_" + tp.identifier, "-1");
                     // put all tuples to each application.
                     //p.hset(this.appName + "_spout", tp.identifier, String.valueOf(tp.ts));
-                    // Group all tuples by each minute for each application.
+                    // ##Group all tuples by each minute for each application.
                     this.p.hset(this.appName + "_spout_"+String.valueOf(minutes),
                             tp.identifier, String.valueOf(miliseconds)+"_"+String.valueOf(tp.priority));
                 }else {
