@@ -74,7 +74,7 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 		Values value ;
 
 		int i=-1;
-		int count = 0, MAX_COUNT=10; // FIXME?
+		int count = 0, MAX_COUNT=1000; // FIXME?
 		while(count < MAX_COUNT) 
 		{
 			List<String> entry = this.eventQueue.poll(); // nextTuple should not block!
@@ -86,7 +86,7 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 				p1 = 0;		
 			try 
 			{
-				ba.batchLogwriter(System.currentTimeMillis(),"MSGID," + msgId, priority[p1]);
+				//ba.batchLogwriter(System.currentTimeMillis(),"MSGID," + msgId, priority[p1]);
 				jr.batchWriter(System.currentTimeMillis(),"MSGID_" + msgId,priority[p1]);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -153,7 +153,7 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 		String uLogfilename=this.outSpoutCSVLogFileName+msgId;
 		this.eventGen.launch(this.csvFileName, uLogfilename, -1, true); //Launch threads
 
-		ba=new BatchedFileLogging(uLogfilename, context.getThisComponentId());
+		//ba=new BatchedFileLogging(uLogfilename, context.getThisComponentId());
 		jr=new JRedis(this.outSpoutCSVLogFileName);
  		priority = new String[1005];
 		p = 0;

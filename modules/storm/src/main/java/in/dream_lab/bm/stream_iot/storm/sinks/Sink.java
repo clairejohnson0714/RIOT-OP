@@ -36,7 +36,7 @@ public class Sink extends BaseRichBolt {
         this.collector=outputCollector;
         BatchedFileLogging.writeToTemp(this, this.csvFileNameOutSink);
          //ba=new BatchedFileLogging();
-        ba=new BatchedFileLogging(this.csvFileNameOutSink, topologyContext.getThisComponentId());
+        //ba=new BatchedFileLogging(this.csvFileNameOutSink, topologyContext.getThisComponentId());
         jr=new JRedis(this.csvFileNameOutSink);
     }
 
@@ -47,7 +47,7 @@ public class Sink extends BaseRichBolt {
         //collector.emit(input,new Values(msgId));
         long ts = System.currentTimeMillis();
         try {
-        	ba.batchLogwriter(System.currentTimeMillis(),msgId);
+        	//ba.batchLogwriter(System.currentTimeMillis(),msgId);
            if (Long.parseLong(msgId) % 10 == 0)
 	    	        jr.batchWriter(System.currentTimeMillis(), msgId);
 		 if (Long.parseLong(msgId) % 20 == 0)
