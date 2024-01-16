@@ -25,7 +25,7 @@ def connectRedis():
     r = redis.StrictRedis(host=redis_host, port=redis_port, password=redis_password, decode_responses=True)
     return r
 
-def calculate_latency(appName="ETLTopologyTAXI", currentTime=time.time()):
+def calculate_latency(appName="IoTPredictionTopologySYS", currentTime=time.time()):
     throughput = 0
     tail_latency = {}
     avg_latency = {}
@@ -42,23 +42,28 @@ def calculate_latency(appName="ETLTopologyTAXI", currentTime=time.time()):
         spout = r.hgetall(appName+"_spout_"+str(timestamp))
         throughput = len(spout)
         sink = r.hgetall(appName+"_sink_"+str(timestamp))
+        #sink2 = r.hgetall(appName+"_sink_"+str(timestamp+60))
+        #sink3 = r.hgetall(appName+"_sink_"+str(timestamp-60))
+        #sink = {**sink, **sink2, **sink3}
 
+        print(len(spout), len(sink))
         for key, value in spout.items():
             priority_value = value.split("_")
             #print("**********",priority_value[0])
-            if int(priority_value[0]) > 45000 or int(priority_value[0]) < 25000:
+            if int(priority_value[0]) > 40000 or int(priority_value[0]) < 20000:
                 #print("in if")
                 continue
-            
             word = key.split("_")
             #print("word[1]",word[1])
             if word[1] in sink:
-                #print("checking sink")
                 #print("####",int(sink[word[1]]),int(priority_value[0]))
-                priority = int(priority_value[1])
+                try:
+                    priority = int(priority_value[1])
+                except Exception as e:
+                    print("Exception ", key, priority_value)
                 if priority in priority_latency:
                     priority_latency[priority].append(int(sink[word[1]]) - int(priority_value[0]))
-            
+        #print("######",priority_latency) 
         for p, latencies in priority_latency.items():
             latencies = sorted(latencies)
             if len(latencies) > 0:
@@ -68,7 +73,9 @@ def calculate_latency(appName="ETLTopologyTAXI", currentTime=time.time()):
                 avg_latency[p] = sum(latencies) / len(latencies)
                 throughput = len(latencies)
                 result[p] = (tail_latency[p], median_latency[p], avg_latency[p], throughput)
-    
+            else:
+                result[p] = (0, 0, 0, throughput)
+   
         return result
     
     except Exception as e:
@@ -91,33 +98,42 @@ def statistic_info(app_name, currentTime):
 
 
 if __name__ == '__main__':
-    with open('/home/cc/storm/riot-bench/output/skopt_input_ETLTopologytaxi.csv', 'a') as f:
-        f.write("latency_priority1,median_latency1,avg_latency_priority1,throughput_priority1,latency_priority2,median_latency2,avg_latency_priority2,throughput_priority2,latency_priority3,median_latency3,avg_latency_priority3,throughput_priority3\n")
+    filePath = "/home/cc/storm/riot-bench/output/skopt_input_IoTPredictionTopologySYS.csv"
+    if not os.path.isfile(filePath):
+        with open(filePath, 'a') as f:
+            f.write("latency_priority1,median_latency1,avg_latency_priority1,throughput_priority1,latency_priority2,median_latency2,avg_latency_priority2,throughput_priority2,latency_priority3,median_latency3,avg_latency_priority3,throughput_priority3\n")
 
     while True:
         currentTime = int(time.time())
         currentTime = currentTime - currentTime % 60
         data = {}
-        for appName in ["ETLTopologyTAXI"]:
+        for appName in ["IoTPredictionTopologySYS"]:
+            start = timeit.default_timer()
             data[appName] = statistic_info(appName, currentTime)
+            stop = timeit.default_timer()
 
-        if data and all(data[appName] for appName in data): #Check if the data dictionary is not empty (data contains data for all specified application names). 
-                                                            
-            with open('/home/cc/storm/riot-bench/output/skopt_input_ETLTopologytaxi.csv', 'a') as f: #If it's not empty, write a new row of data to the CSV file containing the performance metrics for each priority level (1, 2, and 3).
+        if data and all(data[appName] for appName in data):
+            r = connectRedis()
+            r_data = r.get("perf-" + str(currentTime))
+            if r_data:
+                data = json.loads(r_data)
+
+            with open(filePath, 'a') as f:
                 row = [
-                    data[appName]['latency_priority1'],
-                    data[appName]['median_latency_priority1'],
-                    data[appName]['avg_latency_priority1'],
-                    data[appName]['throughput_priority1'],
-                    data[appName]['latency_priority2'],
-                    data[appName]['median_latency_priority2'],
-                    data[appName]['avg_latency_priority2'],
-                    data[appName]['throughput_priority2'],
-                    data[appName]['latency_priority3'],
-                    data[appName]['median_latency_priority3'],
-                    data[appName]['avg_latency_priority3'],
-                    data[appName]['throughput_priority3']
+                    data[appName].get('latency_priority1', 0),
+                    data[appName].get('median_latency_priority1', 0),
+                    data[appName].get('avg_latency_priority1', 0),
+                    data[appName].get('throughput_priority1', 0),
+                    data[appName].get('latency_priority2', 0),
+                    data[appName].get('median_latency_priority2', 0),
+                    data[appName].get('avg_latency_priority2', 0),
+                    data[appName].get('throughput_priority2', 0),
+                    data[appName].get('latency_priority3', 0),
+                    data[appName].get('median_latency_priority3', 0),
+                    data[appName].get('avg_latency_priority3', 0),
+                    data[appName].get('throughput_priority3', 0)
                 ]
                 f.write(','.join(map(str, row)) + '\n')
 
-        time.sleep(60)
+        #time.sleep(60)
+        break
