@@ -79,25 +79,17 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 		Values value ;
 		int priorityval=0;
 		int i=0;
-		int count = 0, MAX_COUNT=1; // FIXME?  For MAX_COUNT 10,20 would produce muliple data at sink
+		int count = 0, MAX_COUNT=30; // FIXME?  For MAX_COUNT 10,20 would produce muliple data at sink
 		while(count < MAX_COUNT) 
 		{
 			List<String> entry = this.eventQueue.poll(); // nextTuple should not block!
 			if(entry == null) break;
 			
 			count++;
-			msgId++;
-
+			
 			if (p1 == 999) 
 				p1 = 0;		
-			//try 
-			//{
-				//ba.batchLogwriter(System.currentTimeMillis(),"MSGID," + msgId, priority[p1]);
-				//if (msgId % 20 == 0)
-				   // jr.batchWriter(System.currentTimeMillis(),"MSGID_" + msgId,priority[p1]);
-			//} catch (Exception e) {
-				//e.printStackTrace();
-			//}
+			
 			StringBuilder rowStringBuf = new StringBuilder();
 			for(String s : entry){
 				rowStringBuf.append(",").append(s);
@@ -105,134 +97,113 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 			}
 			String rowString = rowStringBuf.toString().substring(1);
 			String newRow = rowString.substring(rowString.indexOf(",")+1);
-			
 			//l.warn("Faizavalue {}",newRow);
-			
-            		try 
-					{
-            			// Parse JSON string
-            			ObjectMapper objectMapper = new ObjectMapper();
-            			JsonNode jsonNode = objectMapper.readTree(newRow);
 
-            			// Extract priority value
-            			JsonNode priorityNode = jsonNode.at("/e/8/v");
-            			l.warn("priorityValue as String *************"+ priorityNode );
-						priorityval=priorityNode.asInt();
-						l.warn("priorityval as integer *************"+ priorityval );
-            
-            		} 
-					catch (Exception e) {
+           		try {
+           			// Parse JSON string
+           		 	ObjectMapper objectMapper = new ObjectMapper();
+           		 	JsonNode jsonNode = objectMapper.readTree(newRow);
+
+           		 	// Extract priority value
+           		 	JsonNode priorityNode = jsonNode.at("/e/8/v");
+           		 	//l.warn("priorityValue as String *************"+ priorityNode );
+	   		     	priorityval=priorityNode.asInt();
+	   		     	//l.warn("priorityval as integer *************"+ priorityval );
+           		} 
+			catch (Exception e) {
             			e.printStackTrace();
-        			}
+        		}
 			//int a = Integer.parseInt(priority[p1]);
 			p1++;
+			msgId++;
+			//l.warn("MSG ID *************"+ msgId );
 			if(priorityval==3){
 				value = new Values();
 				value.add(Long.toString(msgId));
 				value.add(newRow);
-				//l.warn("values3 {}",value);
+				l.warn("values3 {}",value);
 				values3.add(value);
 			}
 			if(priorityval==2){
 				value = new Values();
 				value.add(Long.toString(msgId));
+				//value.add(msgId);
 				value.add(newRow);
-				//l.warn("values2 {}",value);
+				l.warn("values2 {}",value);
 				values2.add(value);
 			}
 			if(priorityval==1){
 				value = new Values();
 				value.add(Long.toString(msgId));
+				//value.add(msgId);
 				value.add(newRow);
-				//l.warn("values1 {}",value);
+				l.warn("values1 {}",value);
 				values1.add(value);
 			}
 		}
-		for (i = 0; i < values3.size(); i++) {
+		for (i = 0; i < values3.size(); i++) 
+		{
 			this._collector.emit(values3.get(i));
-
-			ObjectMapper objectMapper = new ObjectMapper();
+			l.warn("Emitted Tuple:"+values3.get(i));
 			try {
-				List<Object> tuple = values3.get(i);
-				if (tuple.size() == 2 && tuple.get(1) instanceof String) {
-					String jsonString = (String) tuple.get(1);
-					JsonNode jsonNode = objectMapper.readTree(jsonString);
-					//l.warn("JSON Structure: " + jsonNode);
-					JsonNode priorityNode = jsonNode.at("/e/8/v");
-					//l.warn("Priority Value as String: " + priorityNode);
-					int priorityValue = priorityNode.asInt();
-					//l.warn("Priority Value as Integer: " + priorityValue);
-					ba.batchLogwriter(System.currentTimeMillis(), "MSGID," + msgId, String.valueOf(priorityValue));
-					jr.batchWriter(System.currentTimeMillis(), "MSGID_" + msgId, String.valueOf(priorityValue));
-				} else {
-					l.error("Invalid tuple structure: " + tuple);
+					List<Object> tuple = values3.get(i);
+					if (tuple.size() == 2 && tuple.get(0) instanceof String) {
+						String values3_msgId = (String) tuple.get(0);
+						l.warn("Timestamp: " + values3_msgId);
+						ba.batchLogwriter(System.currentTimeMillis(), "MSGID," + values3_msgId, String.valueOf(3));
+						jr.batchWriter(System.currentTimeMillis(), "MSGID_" + values3_msgId, String.valueOf(3));
+					} else {
+						l.error("Invalid tuple structure: " + tuple);
+					}
+				}  catch (Exception e) {
+					e.printStackTrace();
 				}
-			} catch (JsonProcessingException e) {
-				e.printStackTrace();
-			} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 
-			
-		}
-		for (i = 0; i < values2.size(); i++) {
-            		this._collector.emit(values2.get(i));
-			ObjectMapper objectMapper = new ObjectMapper();
-			try {
+		
+		for (i = 0; i < values2.size(); i++) 
+		{
+            this._collector.emit(values2.get(i));
+			l.warn("Emitted Tuple:"+values2.get(i));
+			try{
 				List<Object> tuple = values2.get(i);
-				if (tuple.size() == 2 && tuple.get(1) instanceof String) {
-					String jsonString = (String) tuple.get(1);
-					JsonNode jsonNode = objectMapper.readTree(jsonString);
-					//l.warn("JSON Structure: " + jsonNode);
-					JsonNode priorityNode = jsonNode.at("/e/8/v");
-					//l.warn("Priority Value as String: " + priorityNode);
-					int priorityValue = priorityNode.asInt();
-					//l.warn("Priority Value as Integer: " + priorityValue);
-					ba.batchLogwriter(System.currentTimeMillis(), "MSGID," + msgId, String.valueOf(priorityValue));
-					jr.batchWriter(System.currentTimeMillis(), "MSGID_" + msgId, String.valueOf(priorityValue));
-				} else {
-					l.error("Invalid tuple structure: " + tuple);
-				}
-			} catch (JsonProcessingException e) {
+					if (tuple.size() == 2 && tuple.get(0) instanceof String) 
+					{
+						String values2_msgId = (String) tuple.get(0);
+						l.warn("Timestamp: " + values2_msgId);
+						ba.batchLogwriter(System.currentTimeMillis(), "MSGID," + values2_msgId, String.valueOf(2));
+						jr.batchWriter(System.currentTimeMillis(), "MSGID_" + values2_msgId, String.valueOf(2));
+					}else {
+						l.error("Invalid tuple structure: " + tuple);
+					}
+			}
+			catch (Exception e) {
 				e.printStackTrace();
-			} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+			}
 
-        	}
-		for (i = 0; i < values1.size(); i++) {
-            		this._collector.emit(values1.get(i));
-			ObjectMapper objectMapper = new ObjectMapper();
-			try {
+		}
+		for (i = 0; i < values1.size(); i++)
+		{
+            this._collector.emit(values1.get(i));
+			l.warn("Emitted Tuple:"+values1.get(i));
+			try{
 				List<Object> tuple = values1.get(i);
-				if (tuple.size() == 2 && tuple.get(1) instanceof String) {
-					String jsonString = (String) tuple.get(1);
-					JsonNode jsonNode = objectMapper.readTree(jsonString);
-					//l.warn("JSON Structure: " + jsonNode);
-					JsonNode priorityNode = jsonNode.at("/e/8/v");
-					//l.warn("Priority Value as String: " + priorityNode);
-					int priorityValue = priorityNode.asInt();
-					//l.warn("Priority Value as Integer: " + priorityValue);
-					ba.batchLogwriter(System.currentTimeMillis(), "MSGID," + msgId, String.valueOf(priorityValue));
-					jr.batchWriter(System.currentTimeMillis(), "MSGID_" + msgId, String.valueOf(priorityValue));
-				} else {
-					l.error("Invalid tuple structure: " + tuple);
-				}
-			} catch (JsonProcessingException e) {
+					if (tuple.size() == 2 && tuple.get(0) instanceof String) 
+					{
+						String values1_msgId = (String) tuple.get(0);
+						l.warn("Timestamp: " + values1_msgId);
+						ba.batchLogwriter(System.currentTimeMillis(), "MSGID," + values1_msgId, String.valueOf(1));
+						jr.batchWriter(System.currentTimeMillis(), "MSGID_" + values1_msgId, String.valueOf(1));
+					}else {
+						l.error("Invalid tuple structure: " + tuple);
+					}
+			}
+			catch (Exception e) {
 				e.printStackTrace();
-			} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-        	}
-	}
+			}
+        }
 	
+	}
 
 	@Override
 	public void open(Map map, TopologyContext context, SpoutOutputCollector collector) 
