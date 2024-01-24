@@ -74,6 +74,7 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 	@Override
 	public void nextTuple() 
 	{
+		
 		ArrayList<Values> values1 = new ArrayList<Values>();
 		ArrayList<Values> values2 = new ArrayList<Values>();
 		ArrayList<Values> values3 = new ArrayList<Values>();
@@ -104,8 +105,8 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 			String rowString = rowStringBuf.toString().substring(1);
 			String newRow = rowString.substring(rowString.indexOf(",")+1);
 			//l.warn("Faizavalue {}",newRow);
-			//ts = System.currentTimeMillis();
-
+			ts = System.currentTimeMillis();
+			//l.warn("Time Before Extracting priorty"+ts);
            		try 
 				{
            			// Parse JSON string
@@ -129,68 +130,57 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 			//l.warn("MSG ID *************"+ msgId );
 			if(priorityval==3){
 				//Add timestamp of this tuple here and add this as ts
-				ts = System.currentTimeMillis();
+				//ts = System.currentTimeMillis();
+				//l.warn("Time in queue"+ts);
 				value = new Values();
 				value.add(Long.toString(msgId));
 				value.add(newRow);
 				//l.warn("values3 {}",value);
 				values3.add(value);
 				
-				value = new Values(); // I will change logic here instaed of addind all things again just add time at the end of tuple and handle that accordiingly in for loop while emiting
-				value.add(Long.toString(msgId));
 				value.add(ts);
-				value.add(newRow);
 				//l.warn("values33 {}",value);
 				values33.add(value);
-				
-				
-
+				//l.warn("values33 {}",values33);
 			}
 			if(priorityval==2){
-				ts = System.currentTimeMillis();
+				//ts = System.currentTimeMillis();
 				value = new Values();
 				value.add(Long.toString(msgId));
 				value.add(newRow);
 				//l.warn("values2 {}",value);
 				values2.add(value);
 
-				value = new Values();
-				value.add(Long.toString(msgId));
 				value.add(ts);
-				value.add(newRow);
 				//l.warn("values22 {}",value);
 				values22.add(value);
 			
 			}
 			if(priorityval==1){
-				ts =  System.currentTimeMillis();
+				//ts =  System.currentTimeMillis();
 				value = new Values();
 				value.add(Long.toString(msgId));
 				value.add(newRow);
 				//l.warn("values1 {}",value);
 				values1.add(value);
 
-				value = new Values();
-				value.add(Long.toString(msgId));
 				value.add(ts);
-				value.add(newRow);
 				//l.warn("values11 {}",value);
 				values11.add(value);
-				
 			}
 		}
 		//l.warn("value3 size:"+values3.size());
 		//l.warn("value33 size:"+values33.size());
-		int size3 = Math.min(values3.size(), values33.size());
-		for ( i = 0; i < size3; i++) {
+		//int size3 = Math.min(values3.size(), values33.size());
+		for ( i = 0; i < values3.size(); i++) {
 			this._collector.emit(values3.get(i));
 			//l.warn("Emitted Tuple:"+values3.get(i));
 			try {
 				List<Object> element  = (List<Object>) values33.get(i);
-				if (element.size() == 3 && element.get(0) instanceof String && element.get(1) instanceof Long ) {
+				if (element.size() == 3 && element.get(0) instanceof String && element.get(2) instanceof Long ) {
 					String values3_msgId = (String) element.get(0);
 					//l.warn("MSG ID3: " + values3_msgId);
-					Long ts3 = (Long) element.get(1);
+					Long ts3 = (Long) element.get(2);
 					//l.warn("Timestamp: " + ts3);
 					
 					//ba.batchLogwriter(ts3, "MSGID," + values3_msgId, String.valueOf(3));
@@ -202,21 +192,21 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 				e.printStackTrace();
 			}
 		}
-		int size2 = Math.min(values2.size(), values22.size());
-        for (i = 0; i < size2; i++)
+		
+        for (i = 0; i < values2.size(); i++)
 		{    
 			
 			try {
-				Thread.sleep(1); // Pause for 1 millisecond
+				//Thread.sleep(1); // Pause for 1 millisecond
 				this._collector.emit(values2.get(i));
 				//l.warn("Emitted Tuple:" + values2.get(i));
 
 				List<Object> element = values22.get(i);
 
-				if (element.size() == 3 && element.get(0) instanceof String && element.get(1) instanceof Long) {
+				if (element.size() == 3 && element.get(0) instanceof String && element.get(2) instanceof Long) {
 					String values2_msgId = (String) element.get(0);
 					//l.warn("Timestamp: " + values2_msgId);
-					Long ts2 = (Long) element.get(1);
+					Long ts2 = (Long) element.get(2);
 					//ba.batchLogwriter(ts2, "MSGID," + values2_msgId, String.valueOf(2));
 					jr.batchWriter(ts2, "MSGID_" + values2_msgId, String.valueOf(2));
 				} else {
@@ -229,22 +219,19 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 			}
 		}
 
-
-		int size1 = Math.min(values1.size(), values11.size());
-		
-		for (i = 0; i < size1; i++)
+		for (i = 0; i < values1.size(); i++)
 		{
 			try {
 				
-				Thread.sleep(2); // Pause for 2 millisecond
+				//Thread.sleep(2); // Pause for 2 millisecond
 				this._collector.emit(values1.get(i));
 				//l.warn("Emitted Tuple:"+values1.get(i));
 				List<Object> element = values11.get(i);
-					if (element.size() == 3 && element.get(0) instanceof String && element.get(1) instanceof Long) 
+					if (element.size() == 3 && element.get(0) instanceof String && element.get(2) instanceof Long) 
 					{
 						String values1_msgId = (String) element.get(0);
 						//l.warn("Timestamp: " + values1_msgId);
-						Long ts1 = (Long) element.get(1);
+						Long ts1 = (Long) element.get(2);
 						//ba.batchLogwriter(ts1, "MSGID," + values1_msgId, String.valueOf(1));
 						jr.batchWriter(ts1, "MSGID_" + values1_msgId, String.valueOf(1));
 					}else {
