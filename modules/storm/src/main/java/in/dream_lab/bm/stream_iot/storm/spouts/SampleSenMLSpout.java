@@ -41,6 +41,7 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 	BatchedFileLogging ba;
 	JRedis jr;
 	long msgId;
+	long ts;
 	String line;
 	int p1=0;
 	int p=0;
@@ -76,10 +77,15 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 		ArrayList<Values> values1 = new ArrayList<Values>();
 		ArrayList<Values> values2 = new ArrayList<Values>();
 		ArrayList<Values> values3 = new ArrayList<Values>();
+		//Dummy Arrays for time stamps
+		ArrayList<Values> values11 = new ArrayList<Values>();
+		ArrayList<Values> values22 = new ArrayList<Values>();
+		ArrayList<Values> values33 = new ArrayList<Values>();
 		Values value ;
 		int priorityval=0;
 		int i=0;
 		int count = 0, MAX_COUNT=30; // FIXME?  For MAX_COUNT 10,20 would produce muliple data at sink
+		
 		while(count < MAX_COUNT) 
 		{
 			List<String> entry = this.eventQueue.poll(); // nextTuple should not block!
@@ -98,8 +104,10 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 			String rowString = rowStringBuf.toString().substring(1);
 			String newRow = rowString.substring(rowString.indexOf(",")+1);
 			//l.warn("Faizavalue {}",newRow);
+			//ts = System.currentTimeMillis();
 
-           		try {
+           		try 
+				{
            			// Parse JSON string
            		 	ObjectMapper objectMapper = new ObjectMapper();
            		 	JsonNode jsonNode = objectMapper.readTree(newRow);
@@ -110,95 +118,141 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 	   		     	priorityval=priorityNode.asInt();
 	   		     	//l.warn("priorityval as integer *************"+ priorityval );
            		} 
-			catch (Exception e) {
+				catch (Exception e) 
+				{
             			e.printStackTrace();
         		}
 			//int a = Integer.parseInt(priority[p1]);
 			p1++;
 			msgId++;
+					
 			//l.warn("MSG ID *************"+ msgId );
 			if(priorityval==3){
+				//Add timestamp of this tuple here and add this as ts
+				ts = System.currentTimeMillis();
 				value = new Values();
 				value.add(Long.toString(msgId));
 				value.add(newRow);
-				l.warn("values3 {}",value);
+				//l.warn("values3 {}",value);
 				values3.add(value);
+				
+				value = new Values(); // I will change logic here instaed of addind all things again just add time at the end of tuple and handle that accordiingly in for loop while emiting
+				value.add(Long.toString(msgId));
+				value.add(ts);
+				value.add(newRow);
+				//l.warn("values33 {}",value);
+				values33.add(value);
+				
+				
+
 			}
 			if(priorityval==2){
+				ts = System.currentTimeMillis();
 				value = new Values();
 				value.add(Long.toString(msgId));
-				//value.add(msgId);
 				value.add(newRow);
-				l.warn("values2 {}",value);
+				//l.warn("values2 {}",value);
 				values2.add(value);
+
+				value = new Values();
+				value.add(Long.toString(msgId));
+				value.add(ts);
+				value.add(newRow);
+				//l.warn("values22 {}",value);
+				values22.add(value);
+			
 			}
 			if(priorityval==1){
+				ts =  System.currentTimeMillis();
 				value = new Values();
 				value.add(Long.toString(msgId));
-				//value.add(msgId);
 				value.add(newRow);
-				l.warn("values1 {}",value);
+				//l.warn("values1 {}",value);
 				values1.add(value);
-			}
-		}
-		for (i = 0; i < values3.size(); i++) 
-		{
-			this._collector.emit(values3.get(i));
-			l.warn("Emitted Tuple:"+values3.get(i));
-			try {
-					List<Object> tuple = values3.get(i);
-					if (tuple.size() == 2 && tuple.get(0) instanceof String) {
-						String values3_msgId = (String) tuple.get(0);
-						l.warn("Timestamp: " + values3_msgId);
-						ba.batchLogwriter(System.currentTimeMillis(), "MSGID," + values3_msgId, String.valueOf(3));
-						jr.batchWriter(System.currentTimeMillis(), "MSGID_" + values3_msgId, String.valueOf(3));
-					} else {
-						l.error("Invalid tuple structure: " + tuple);
-					}
-				}  catch (Exception e) {
-					e.printStackTrace();
-				}
-		}
 
-		
-		for (i = 0; i < values2.size(); i++) 
-		{
-            this._collector.emit(values2.get(i));
-			l.warn("Emitted Tuple:"+values2.get(i));
-			try{
-				List<Object> tuple = values2.get(i);
-					if (tuple.size() == 2 && tuple.get(0) instanceof String) 
-					{
-						String values2_msgId = (String) tuple.get(0);
-						l.warn("Timestamp: " + values2_msgId);
-						ba.batchLogwriter(System.currentTimeMillis(), "MSGID," + values2_msgId, String.valueOf(2));
-						jr.batchWriter(System.currentTimeMillis(), "MSGID_" + values2_msgId, String.valueOf(2));
-					}else {
-						l.error("Invalid tuple structure: " + tuple);
-					}
+				value = new Values();
+				value.add(Long.toString(msgId));
+				value.add(ts);
+				value.add(newRow);
+				//l.warn("values11 {}",value);
+				values11.add(value);
+				
 			}
-			catch (Exception e) {
+		}
+		//l.warn("value3 size:"+values3.size());
+		//l.warn("value33 size:"+values33.size());
+		int size3 = Math.min(values3.size(), values33.size());
+		for ( i = 0; i < size3; i++) {
+			this._collector.emit(values3.get(i));
+			//l.warn("Emitted Tuple:"+values3.get(i));
+			try {
+				List<Object> element  = (List<Object>) values33.get(i);
+				if (element.size() == 3 && element.get(0) instanceof String && element.get(1) instanceof Long ) {
+					String values3_msgId = (String) element.get(0);
+					//l.warn("MSG ID3: " + values3_msgId);
+					Long ts3 = (Long) element.get(1);
+					//l.warn("Timestamp: " + ts3);
+					
+					//ba.batchLogwriter(ts3, "MSGID," + values3_msgId, String.valueOf(3));
+					jr.batchWriter(ts3, "MSGID_" + values3_msgId, String.valueOf(3));
+				} else {
+					// l.error("Invalid tuple structure: " + tuple);
+				}
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-
 		}
-		for (i = 0; i < values1.size(); i++)
+		int size2 = Math.min(values2.size(), values22.size());
+        for (i = 0; i < size2; i++)
+		{    
+			
+			try {
+				Thread.sleep(1); // Pause for 1 millisecond
+				this._collector.emit(values2.get(i));
+				//l.warn("Emitted Tuple:" + values2.get(i));
+
+				List<Object> element = values22.get(i);
+
+				if (element.size() == 3 && element.get(0) instanceof String && element.get(1) instanceof Long) {
+					String values2_msgId = (String) element.get(0);
+					//l.warn("Timestamp: " + values2_msgId);
+					Long ts2 = (Long) element.get(1);
+					//ba.batchLogwriter(ts2, "MSGID," + values2_msgId, String.valueOf(2));
+					jr.batchWriter(ts2, "MSGID_" + values2_msgId, String.valueOf(2));
+				} else {
+					//l.error("Invalid tuple structure: " + tuple);
+				}
+			} 
+			catch (Exception e) {
+				//l.error("Exception while processing tuple: " + e.getMessage());
+				e.printStackTrace();
+			}
+		}
+
+
+		int size1 = Math.min(values1.size(), values11.size());
+		
+		for (i = 0; i < size1; i++)
 		{
-            this._collector.emit(values1.get(i));
-			l.warn("Emitted Tuple:"+values1.get(i));
-			try{
-				List<Object> tuple = values1.get(i);
-					if (tuple.size() == 2 && tuple.get(0) instanceof String) 
+			try {
+				
+				Thread.sleep(2); // Pause for 2 millisecond
+				this._collector.emit(values1.get(i));
+				//l.warn("Emitted Tuple:"+values1.get(i));
+				List<Object> element = values11.get(i);
+					if (element.size() == 3 && element.get(0) instanceof String && element.get(1) instanceof Long) 
 					{
-						String values1_msgId = (String) tuple.get(0);
-						l.warn("Timestamp: " + values1_msgId);
-						ba.batchLogwriter(System.currentTimeMillis(), "MSGID," + values1_msgId, String.valueOf(1));
-						jr.batchWriter(System.currentTimeMillis(), "MSGID_" + values1_msgId, String.valueOf(1));
+						String values1_msgId = (String) element.get(0);
+						//l.warn("Timestamp: " + values1_msgId);
+						Long ts1 = (Long) element.get(1);
+						//ba.batchLogwriter(ts1, "MSGID," + values1_msgId, String.valueOf(1));
+						jr.batchWriter(ts1, "MSGID_" + values1_msgId, String.valueOf(1));
 					}else {
-						l.error("Invalid tuple structure: " + tuple);
+						//l.error("Invalid tuple structure: " + tuple);
 					}
 			}
 			catch (Exception e) {
+				//l.error("Exception while processing tuple: " + e.getMessage());
 				e.printStackTrace();
 			}
         }
@@ -232,7 +286,7 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 
 		this.eventGen.launch(this.csvFileName, uLogfilename, -1, true); //Launch threads
 
-		ba=new BatchedFileLogging(uLogfilename, context.getThisComponentId());
+		//ba=new BatchedFileLogging(uLogfilename, context.getThisComponentId());
 		jr=new JRedis(this.outSpoutCSVLogFileName);
  		priority = new String[1005];
 		p = 0;
