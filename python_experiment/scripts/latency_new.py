@@ -4,9 +4,9 @@ import timeit
 # Spout Tuple: [time, "MSGID", pid, priority]
 # Sink Tuple: [time, pid]
 HOME = "/home/cc"
-ARGUMENT = 1
+ARGUMENT = # Fill in command line argument here
 RATE = format(ARGUMENT / 1.5, ".4f")
-TIME = "1861000000004"
+TIME = "" # Fill in time of spout file when it is created here
 SPOUT_FILE = f"{HOME}/storm/riot-bench/output/spout-ETLTopologySYS-SENML-{RATE}.log{TIME}"
 SINK_FILE = f"{HOME}/storm/riot-bench/output/sink-ETLTopologySYS-SENML-{RATE}.log"
 
