@@ -14,7 +14,7 @@ public class ArgumentParser {
      */
     public static ArgumentClass parserCLI(String [] args)
     {
-    	if(args == null || args.length < 8){
+    	if(args == null || args.length <= 8){
             System.out.println("invalid number of arguments");
             return null;
         }
