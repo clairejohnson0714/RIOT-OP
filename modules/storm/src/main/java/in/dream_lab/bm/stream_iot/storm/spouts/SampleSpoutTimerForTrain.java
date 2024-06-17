@@ -83,9 +83,9 @@ public class SampleSpoutTimerForTrain extends BaseRichSpout implements ISyntheti
 			long ts = System.currentTimeMillis();
 			try
 			{
-				//ba.batchLogwriter(System.currentTimeMillis(),"MSGID," + msgId);
-				if (msgId % 20 == 0)
-					jr.batchWriter(ts, "MSGID_" + msgId);
+				ba.batchLogwriter(System.currentTimeMillis(),"MSGID," + msgId);
+				//if (msgId % 20 == 0)
+					//jr.batchWriter(ts, "MSGID_" + msgId);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
