@@ -100,7 +100,7 @@ sink_line = 1
 minute = 1
 while True:
     start = timeit.default_timer()
-    with open(SPOUT_FILE, "r") as spout, open(SINK_FILE, "r") as sink:
+    with open(SPOUT_FILE, "r") as spout, open(SINK_FILE, "r") as sink, open(OUTPUT_FILE, "a") as output:
         spout_tuples, spout_line = get_spout_tuples(spout, spout_line)
         print(f"Minute {minute}")
         if (spout_tuples == []):
@@ -113,6 +113,7 @@ while True:
             continue
         sink_tuples, sink_line = get_sink_tuples(sink, sink_line, sink_tuples)
         throughput, tail_latency = calculate_latency(spout_tuples, sink_tuples)
+        output.write(f"{minute} {throughput} {tail_latency}\n")
         print(f"\tThroughput: {throughput} tuples")
         print(f"\t95th Percentile Tail Latency: {tail_latency} ms")
     end = timeit.default_timer() 
