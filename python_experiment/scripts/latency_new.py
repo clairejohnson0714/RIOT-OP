@@ -1,14 +1,16 @@
+import sys
 import time
 import timeit
 
 # Spout Tuple: [time, "MSGID", pid, priority]
 # Sink Tuple: [time, pid]
 HOME = "/home/cc"
-ARGUMENT = # Fill in command line argument here
+ARGUMENT = float(sys.argv[1])
 RATE = format(ARGUMENT / 1.5, ".4f")
-TIME = "" # Fill in time of spout file when it is created here
+TIME = sys.argv[2]
 SPOUT_FILE = f"{HOME}/storm/riot-bench/output/spout-ETLTopologySYS-SENML-{RATE}.log{TIME}"
 SINK_FILE = f"{HOME}/storm/riot-bench/output/sink-ETLTopologySYS-SENML-{RATE}.log"
+OUTPUT_FILE = f"{HOME}/storm/riot-bench/output/output-ETLTopologySYS-SENML-{RATE}.log{TIME}"
 
 # Algorithm Idea
 # Use hash table of sink data for much faster O(n) searching - overwhelming majority of processes will exist in the hash table
