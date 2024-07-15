@@ -2,15 +2,16 @@ import sys
 import time
 import timeit
 
+# Usgage: python latency_new.py SPOUT_FILE SINK_FILE
 # Spout Tuple: [time, "MSGID", pid, priority]
 # Sink Tuple: [time, pid]
 HOME = "/home/cc"
-ARGUMENT = float(sys.argv[1])
-RATE = format(ARGUMENT / 1.5, ".4f")
-TIME = sys.argv[2]
-SPOUT_FILE = f"{HOME}/storm/riot-bench/output/spout-ETLTopologySYS-SENML-{RATE}.log{TIME}"
-SINK_FILE = f"{HOME}/storm/riot-bench/output/sink-ETLTopologySYS-SENML-{RATE}.log"
-OUTPUT_FILE = f"{HOME}/storm/riot-bench/output/output-ETLTopologySYS-SENML-{RATE}.log{TIME}"
+SPOUT_FILE = f"{HOME}/storm/riot-bench/output/{sys.argv[1]}"
+SINK_FILE = f"{HOME}/storm/riot-bench/output/{sys.argv[2]}"
+OUTPUT_FILE = f"{HOME}/storm/riot-bench/output/output-{sys.argv[2][5:]}"
+print(f"Spout File: {SPOUT_FILE}")
+print(f"Sink File: {SINK_FILE}")
+print(f"Program Output File: {OUTPUT_FILE}")
 
 # Algorithm Idea
 # Use hash table of sink data for much faster O(n) searching - overwhelming majority of processes will exist in the hash table
@@ -72,7 +73,7 @@ def calculate_latency(spout_tuples, sink_tuples):
         # Will need to search through all of sink_tuples now - use slower exhaustive search algorithm insead
         # If still not found, then this is a packet that was dropped
         if pid_spout != pid_sink:
-            print(f"NOTE: Process ID {pid_spout} was not found at the expected index in the hash table!")
+            #print(f"NOTE: Process ID {pid_spout} was not found at the expected index in the hash table!")
             found = False
             for sink_tuple in sink_tuples:
                 time_sink, pid_sink = sink_tuple
@@ -81,15 +82,19 @@ def calculate_latency(spout_tuples, sink_tuples):
                     found = True
                     break
             if found == False:
-                print(f"NOTE: Could not find process ID {pid_spout} in the sink!")
+                #print(f"NOTE: Could not find process ID {pid_spout} in the sink!")
+                pass
         else:
                 latencies.append(time_sink - time_spout)
 
     # Calculate throughput and 95th percentile tail latency
-    latencies = sorted(latencies)
-    throughput = len(latencies)
-    tail_latency = latencies[int(len(latencies) * 0.95)]
-    return throughput, tail_latency
+    if len(latencies) == 0:
+        return 0, 0
+    else:
+        latencies = sorted(latencies)
+        throughput = len(latencies)
+        tail_latency = latencies[int(len(latencies) * 0.95)]
+        return throughput, tail_latency
 
 print("Sleeping for 1 minute to allow data to come in zzz...") # Data starts being transmitted 60 to 90 seconds after topology start
 time.sleep(60)
