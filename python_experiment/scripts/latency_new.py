@@ -73,17 +73,17 @@ def calculate_latency(spout_tuples, sink_tuples):
         # Will need to search through all of sink_tuples now - use slower exhaustive search algorithm insead
         # If still not found, then this is a packet that was dropped
         if pid_spout != pid_sink:
+            pass
             #print(f"NOTE: Process ID {pid_spout} was not found at the expected index in the hash table!")
-            found = False
-            for sink_tuple in sink_tuples:
-                time_sink, pid_sink = sink_tuple
-                if pid_spout == pid_sink:
-                    latencies.append(time_sink - time_spout)
-                    found = True
-                    break
-            if found == False:
+            #found = False
+            #for sink_tuple in sink_tuples:
+                #time_sink, pid_sink = sink_tuple
+                #if pid_spout == pid_sink:
+                    #latencies.append(time_sink - time_spout)
+                    #found = True
+                    #break
+            #if found == False:
                 #print(f"NOTE: Could not find process ID {pid_spout} in the sink!")
-                pass
         else:
                 latencies.append(time_sink - time_spout)
 
