@@ -1,6 +1,7 @@
 import sys
 import time
 import timeit
+import linecache
 
 # Usgage: python latency_new.py SPOUT_FILE SINK_FILE
 # Spout Tuple: [time, "MSGID", pid, priority]
@@ -19,14 +20,11 @@ print(f"Program Output File: {OUTPUT_FILE}")
 # If it is still not found at this point, then the process was dropped and did not reach the sink
 
 # Given spout file stream and starting line number, get 1 minute's worth of tuples
-def get_spout_tuples(spout, spout_line):
+def get_spout_tuples(spout_file, spout_line):
     spout_tuples = []
-    # Skip past tuples
-    for i in range(1, spout_line):
-        next(spout)
-
+    tuple = linecache.getline(spout_file, spout_line).strip()
     # For each new tuple, check time and collect it if it's within 1 minute
-    for tuple in spout:
+    while tuple != "":
         time, msgid, pid, priority = tuple.split(",")
         time = int(time)
         pid = int(pid)
@@ -35,45 +33,45 @@ def get_spout_tuples(spout, spout_line):
         if time <= start_time + 60000: # Not doing start_time <= time as some data are delayed slightly
             spout_tuples.append([time, pid])
             spout_line += 1
+            tuple = linecache.getline(spout_file, spout_line).strip()
         else:
             break
     return spout_tuples, spout_line
 
 # Given sink file stream and starting line number, get/update hash table of sink tuples sorted by pid number
-def get_sink_tuples(sink, sink_line, sink_tuples):
-    # Skip past tuples
-    for i in range(1, sink_line):
-        next(sink)
-
+def get_sink_tuples(sink_file, sink_line, sink_tuples):
+    tuple = linecache.getline(sink_file, sink_line).strip()
     # For each new tuple in the file, add it to the list
-    for tuple in sink:
+    while tuple != "":
         time, pid = map(int, tuple.split(","))
         sink_tuples.append([time, pid])
         sink_line += 1
+        tuple = linecache.getline(sink_file, sink_line).strip()
     sink_tuples = sorted(sink_tuples, key = lambda x : x[1])
     return sink_tuples, sink_line
 
 
 # Given 1 minute's worth of tuples and sink tuple hash table, calculate throughput and 95th percentile tail latency
 def calculate_latency(spout_tuples, sink_tuples):
-    min_pid = sink_tuples[0][1]
     latencies = []
     # For each collected tuple, find its end time (by accessing the hash table via its pid) and calculate latency
     for spout_tuple in spout_tuples:
+        min_pid = sink_tuples[0][1]
         time_spout, pid_spout = spout_tuple
         try:
             time_sink, pid_sink = sink_tuples[pid_spout - min_pid]
             # time_sink = -1
             # pid_sink = -1
         except: # Index out of bounds (a packet was dropped, or pids are not consecutive) - use slower exhaustive search algorithm instead
-            time_sink = -1
-            pid_sink = -1
+            print("This should never happen on COMPLETE, FINISHED data - 1")
+            #time_sink = -1
+            #pid_sink = -1
 
         # If the hash table entry does not match or the index is out of bounds, then at least one packet was dropped
         # Will need to search through all of sink_tuples now - use slower exhaustive search algorithm insead
         # If still not found, then this is a packet that was dropped
         if pid_spout != pid_sink:
-            pass
+            print("This should never happen on COMPLETE, FINISHED data - 2")
             #print(f"NOTE: Process ID {pid_spout} was not found at the expected index in the hash table!")
             #found = False
             #for sink_tuple in sink_tuples:
@@ -85,7 +83,8 @@ def calculate_latency(spout_tuples, sink_tuples):
             #if found == False:
                 #print(f"NOTE: Could not find process ID {pid_spout} in the sink!")
         else:
-                latencies.append(time_sink - time_spout)
+            latencies.append(time_sink - time_spout)
+        del sink_tuples[pid_spout - min_pid]
 
     # Calculate throughput and 95th percentile tail latency
     if len(latencies) == 0:
@@ -105,8 +104,8 @@ sink_line = 1
 minute = 1
 while True:
     start = timeit.default_timer()
-    with open(SPOUT_FILE, "r") as spout, open(SINK_FILE, "r") as sink, open(OUTPUT_FILE, "a") as output:
-        spout_tuples, spout_line = get_spout_tuples(spout, spout_line)
+    with open(OUTPUT_FILE, "a") as output:
+        spout_tuples, spout_line = get_spout_tuples(SPOUT_FILE, spout_line)
         print(f"Minute {minute}")
         if (spout_tuples == []):
             print("All data read! Now sleeping for the rest of the minute zzz...")
@@ -116,7 +115,7 @@ while True:
             minute += 1
             time.sleep(60 - exec_time) # Want to sleep for the rest of the current minute to allow more data to come in
             continue
-        sink_tuples, sink_line = get_sink_tuples(sink, sink_line, sink_tuples)
+        sink_tuples, sink_line = get_sink_tuples(SINK_FILE, sink_line, sink_tuples)
         throughput, tail_latency = calculate_latency(spout_tuples, sink_tuples)
         output.write(f"{minute} {throughput} {tail_latency}\n")
         print(f"\tThroughput: {throughput} tuples")
@@ -126,4 +125,4 @@ while True:
     print(f"\tExecution Time: {exec_time} seconds")
     minute += 1
     print("Sleeping for the rest of the minute zzz...\n")
-    time.sleep(60 - exec_time) # Want to sleep for the rest of the current minute to allow more data to come in
+    time.sleep(max(60 - exec_time, 0)) # Want to sleep for the rest of the current minute to allow more data to come in
