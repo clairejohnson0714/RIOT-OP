@@ -62,17 +62,16 @@ def calculate_latency(spout_tuples, sink_tuples):
     latencies = []
     # For each collected tuple, find its end time (by accessing the hash table via its pid) and calculate latency
     for spout_tuple in spout_tuples:
-        min_pid = sink_tuples[0][1]
-        time_spout, pid_spout = spout_tuple
         try:
+            min_pid = sink_tuples[0][1]
+            time_spout, pid_spout = spout_tuple
             time_sink, pid_sink = sink_tuples[pid_spout - min_pid]
             # time_sink = -1
             # pid_sink = -1
         except: # Index out of bounds (a packet was dropped, or pids are not consecutive) - use slower exhaustive search algorithm instead
-            pass
             #print("This should never happen on COMPLETE, FINISHED data; either that, or latency is extremely high - 1")
-            #time_sink = -1
-            #pid_sink = -1
+            time_sink = -1
+            pid_sink = -1
 
         # If the hash table entry does not match or the index is out of bounds, then at least one packet was dropped
         # Will need to search through all of sink_tuples now - use slower exhaustive search algorithm insead
