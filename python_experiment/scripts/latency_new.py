@@ -69,7 +69,8 @@ def calculate_latency(spout_tuples, sink_tuples):
             # time_sink = -1
             # pid_sink = -1
         except: # Index out of bounds (a packet was dropped, or pids are not consecutive) - use slower exhaustive search algorithm instead
-            print("This should never happen on COMPLETE, FINISHED data; either that, or latency is extremely high - 1")
+            pass
+            #print("This should never happen on COMPLETE, FINISHED data; either that, or latency is extremely high - 1")
             #time_sink = -1
             #pid_sink = -1
 
@@ -77,7 +78,8 @@ def calculate_latency(spout_tuples, sink_tuples):
         # Will need to search through all of sink_tuples now - use slower exhaustive search algorithm insead
         # If still not found, then this is a packet that was dropped
         if pid_spout != pid_sink:
-            print("This should never happen on COMPLETE, FINISHED data; either that, or latency is extremely high - 2")
+            pass
+            #print("This should never happen on COMPLETE, FINISHED data; either that, or latency is extremely high - 2")
             #print(f"NOTE: Process ID {pid_spout} was not found at the expected index in the hash table!")
             #found = False
             #for sink_tuple in sink_tuples:
@@ -90,7 +92,6 @@ def calculate_latency(spout_tuples, sink_tuples):
                 #print(f"NOTE: Could not find process ID {pid_spout} in the sink!")
         else:
             latencies.append(time_sink - time_spout)
-        del sink_tuples[pid_spout - min_pid]
 
     # Calculate throughput and 95th percentile tail latency
     if len(latencies) == 0:
