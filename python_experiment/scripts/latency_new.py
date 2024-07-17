@@ -23,6 +23,9 @@ print(f"Program Output File: {OUTPUT_FILE}")
 def get_spout_tuples(spout_file, spout_line):
     spout_tuples = []
     tuple = linecache.getline(spout_file, spout_line).strip()
+    if tuple == "":
+        linecache.checkcache() # Update linecache's files
+        tuple = linecache.getline(spout_file, spout_line).strip()
     # For each new tuple, check time and collect it if it's within 1 minute
     while tuple != "":
         time, msgid, pid, priority = tuple.split(",")
@@ -41,6 +44,9 @@ def get_spout_tuples(spout_file, spout_line):
 # Given sink file stream and starting line number, get/update hash table of sink tuples sorted by pid number
 def get_sink_tuples(sink_file, sink_line, sink_tuples):
     tuple = linecache.getline(sink_file, sink_line).strip()
+    if tuple == "":
+        linecache.checkcache() # Update linecache's files
+        tuple = linecache.getline(sink_file, sink_line).strip()
     # For each new tuple in the file, add it to the list
     while tuple != "":
         time, pid = map(int, tuple.split(","))
@@ -63,7 +69,7 @@ def calculate_latency(spout_tuples, sink_tuples):
             # time_sink = -1
             # pid_sink = -1
         except: # Index out of bounds (a packet was dropped, or pids are not consecutive) - use slower exhaustive search algorithm instead
-            print("This should never happen on COMPLETE, FINISHED data - 1")
+            print("This should never happen on COMPLETE, FINISHED data; either that, or latency is extremely high - 1")
             #time_sink = -1
             #pid_sink = -1
 
@@ -71,7 +77,7 @@ def calculate_latency(spout_tuples, sink_tuples):
         # Will need to search through all of sink_tuples now - use slower exhaustive search algorithm insead
         # If still not found, then this is a packet that was dropped
         if pid_spout != pid_sink:
-            print("This should never happen on COMPLETE, FINISHED data - 2")
+            print("This should never happen on COMPLETE, FINISHED data; either that, or latency is extremely high - 2")
             #print(f"NOTE: Process ID {pid_spout} was not found at the expected index in the hash table!")
             #found = False
             #for sink_tuple in sink_tuples:
@@ -109,18 +115,19 @@ while True:
         print(f"Minute {minute}")
         if (spout_tuples == []):
             print("All data read! Now sleeping for the rest of the minute zzz...")
+            output.write(f"{minute} 0 0\n")
             end = timeit.default_timer()
             exec_time = end - start
             print(f"\tExecution Time: {exec_time} seconds\n")
             minute += 1
-            time.sleep(60 - exec_time) # Want to sleep for the rest of the current minute to allow more data to come in
+            time.sleep(max(60 - exec_time, 0)) # Want to sleep for the rest of the current minute to allow more data to come in
             continue
         sink_tuples, sink_line = get_sink_tuples(SINK_FILE, sink_line, sink_tuples)
         throughput, tail_latency = calculate_latency(spout_tuples, sink_tuples)
         output.write(f"{minute} {throughput} {tail_latency}\n")
         print(f"\tThroughput: {throughput} tuples")
         print(f"\t95th Percentile Tail Latency: {tail_latency} ms")
-    end = timeit.default_timer() 
+    end = timeit.default_timer()
     exec_time = end - start
     print(f"\tExecution Time: {exec_time} seconds")
     minute += 1
