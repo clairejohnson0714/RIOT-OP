@@ -84,7 +84,8 @@ def calculate_latency(spout_tuples, sink_tuples):
                     found = True
                     break
             if found == False:
-                print("If this happens, then latency is too high - 3")
+                pass
+                #print("If this happens, then latency is too high - 3")
                 #print(f"WARNING: Process ID {pid_spout} was never found!")
         else:
             latencies.append(time_sink - time_spout)
