@@ -66,29 +66,26 @@ def calculate_latency(spout_tuples, sink_tuples):
             min_pid = sink_tuples[0][1]
             time_spout, pid_spout = spout_tuple
             time_sink, pid_sink = sink_tuples[pid_spout - min_pid]
-            # time_sink = -1
-            # pid_sink = -1
-        except: # Index out of bounds (a packet was dropped, or pids are not consecutive) - use slower exhaustive search algorithm instead
-            #print("This should never happen on COMPLETE, FINISHED data; either that, or latency is extremely high - 1")
+        except:
+            #print("If this happens, then latency is too high or the sleep statements have been commented out - 1")
             time_sink = -1
             pid_sink = -1
 
-        # If the hash table entry does not match or the index is out of bounds, then at least one packet was dropped
+        # If the hash table entry does not match or the index is out of bounds, then the files are misaligned due to high latency
         # Will need to search through all of sink_tuples now - use slower exhaustive search algorithm insead
-        # If still not found, then this is a packet that was dropped
         if pid_spout != pid_sink:
-            pass
-            #print("This should never happen on COMPLETE, FINISHED data; either that, or latency is extremely high - 2")
+            #print("If this happens, then latency is too high or the sleep statements have been commented out - 2")
             #print(f"NOTE: Process ID {pid_spout} was not found at the expected index in the hash table!")
-            #found = False
-            #for sink_tuple in sink_tuples:
-                #time_sink, pid_sink = sink_tuple
-                #if pid_spout == pid_sink:
-                    #latencies.append(time_sink - time_spout)
-                    #found = True
-                    #break
-            #if found == False:
-                #print(f"NOTE: Could not find process ID {pid_spout} in the sink!")
+            found = False
+            for sink_tuple in sink_tuples:
+                time_sink, pid_sink = sink_tuple
+                if pid_spout == pid_sink:
+                    latencies.append(time_sink - time_spout)
+                    found = True
+                    break
+            if found == False:
+                print("If this happens, then latency is too high - 3")
+                #print(f"WARNING: Process ID {pid_spout} was never found!")
         else:
             latencies.append(time_sink - time_spout)
 
