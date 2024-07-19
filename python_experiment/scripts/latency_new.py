@@ -12,7 +12,7 @@ import os
 HOME = "/home/cc"
 SPOUT_FILE = f"{HOME}/storm/riot-bench/output/{sys.argv[1]}"
 SINK_FILE = f"{HOME}/storm/riot-bench/output/{sys.argv[2]}"
-OUTPUT_FILE = f"{HOME}/cc/storm/riot-bench/output/data.csv"
+OUTPUT_FILE = f"{HOME}/storm/riot-bench/output/data.csv"
 
 print(f"Spout File: {SPOUT_FILE}")
 print(f"Sink File: {SINK_FILE}")
