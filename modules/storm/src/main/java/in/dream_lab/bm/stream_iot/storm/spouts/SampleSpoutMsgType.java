@@ -91,7 +91,7 @@ public class SampleSpoutMsgType extends BaseRichSpout implements ISyntheticEvent
 
 			try {
 //				msgId++;
-				ba.batchLogwriter(System.currentTimeMillis(),"MSGID," + msgId);
+				//ba.batchLogwriter(System.currentTimeMillis(),"MSGID," + msgId);
 				//ba.batchLogwriter(System.nanoTime(),"MSGID," + msgId);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -117,7 +117,7 @@ public class SampleSpoutMsgType extends BaseRichSpout implements ISyntheticEvent
 		String uLogfilename=this.outSpoutCSVLogFileName+msgId;
 		this.eventGen.launch(this.csvFileName, uLogfilename); //Launch threads
 
-		ba=new BatchedFileLogging(uLogfilename, context.getThisComponentId());
+		//ba=new BatchedFileLogging(uLogfilename, context.getThisComponentId());
 
 
 	}
