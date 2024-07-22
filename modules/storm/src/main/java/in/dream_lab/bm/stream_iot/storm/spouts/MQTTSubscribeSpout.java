@@ -64,7 +64,7 @@ public class MQTTSubscribeSpout extends BaseRichSpout {
         initLogger(LoggerFactory.getLogger("APP"));
 
         mqttSubscribeTask.setup(l,p);
-        ba=new BatchedFileLogging(spoutLogFileName, topologyContext.getThisComponentId());
+        //ba=new BatchedFileLogging(spoutLogFileName, topologyContext.getThisComponentId());
     }
 
     public void nextTuple() {
@@ -88,7 +88,7 @@ public class MQTTSubscribeSpout extends BaseRichSpout {
         if(arg1!=null) {
             try {
                 msgid++;
-                ba.batchLogwriter(tsc,"MSGID," + msgid);
+                //ba.batchLogwriter(tsc,"MSGID," + msgid);
                 //ba.batchLogwriter(System.nanoTime(),"MSGID," + msgId);
             } catch (Exception e) {
                 e.printStackTrace();
