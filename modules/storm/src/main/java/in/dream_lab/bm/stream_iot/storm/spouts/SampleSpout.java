@@ -79,9 +79,9 @@ public class SampleSpout extends BaseRichSpout implements ISyntheticEventGen {
 			this._collector.emit(values);
 			try {
 //				msgId++;
-				ba.batchLogwriter(System.currentTimeMillis(),"MSGID," + msgId);
-				//if (msgId % 20 == 0)
-					//jr.batchWriter(System.currentTimeMillis(),"MSGID_" + msgId);
+				//ba.batchLogwriter(System.currentTimeMillis(),"MSGID," + msgId);
+				if (msgId % 20 == 0)
+					jr.batchWriter(System.currentTimeMillis(),"MSGID_" + msgId);
 				//ba.batchLogwriter(System.nanoTime(),"MSGID," + msgId);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -173,7 +173,7 @@ public class SampleSpout extends BaseRichSpout implements ISyntheticEventGen {
 		String uLogfilename=this.outSpoutCSVLogFileName+msgId;
 		this.eventGen.launch(this.csvFileName, uLogfilename); //Launch threads
 
-		ba=new BatchedFileLogging(uLogfilename, context.getThisComponentId());
+		//ba=new BatchedFileLogging(uLogfilename, context.getThisComponentId());
 		jr=new JRedis(this.outSpoutCSVLogFileName);
 
 	}
