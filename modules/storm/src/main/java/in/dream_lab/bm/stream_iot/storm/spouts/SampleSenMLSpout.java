@@ -184,8 +184,8 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 					Long ts3 = (Long) element3.get(2);
 					//l.warn("Timestamp: " + ts3);
 					
-					ba.batchLogwriter(ts3, "MSGID," + values3_msgId, String.valueOf(3));
-					//jr.batchWriter(ts3, "MSGID_" + values3_msgId, String.valueOf(3));
+					//ba.batchLogwriter(ts3, "MSGID," + values3_msgId, String.valueOf(3));
+					jr.batchWriter(ts3, "MSGID_" + values3_msgId, String.valueOf(3));
 				} else {
 					// l.error("Invalid tuple structure: " + tuple);
 				}
@@ -205,8 +205,8 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 					String values2_msgId = (String) element2.get(0);
 					//l.warn("Timestamp: " + values2_msgId);
 					Long ts2 = (Long) element2.get(2);
-					ba.batchLogwriter(ts2, "MSGID," + values2_msgId, String.valueOf(2));
-					//jr.batchWriter(ts2, "MSGID_" + values2_msgId, String.valueOf(2));
+					//ba.batchLogwriter(ts2, "MSGID," + values2_msgId, String.valueOf(2));
+					jr.batchWriter(ts2, "MSGID_" + values2_msgId, String.valueOf(2));
 				} else {
 					//l.error("Invalid tuple structure: " + tuple);
 				}
@@ -229,8 +229,8 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 						String values1_msgId = (String) element.get(0);
 						//l.warn("Timestamp: " + values1_msgId);
 						Long ts1 = (Long) element.get(2);
-						ba.batchLogwriter(ts1, "MSGID," + values1_msgId, String.valueOf(1));
-						//jr.batchWriter(ts1, "MSGID_" + values1_msgId, String.valueOf(1));
+						//ba.batchLogwriter(ts1, "MSGID," + values1_msgId, String.valueOf(1));
+						jr.batchWriter(ts1, "MSGID_" + values1_msgId, String.valueOf(1));
 					}else {
 						//l.error("Invalid tuple structure: " + tuple);
 					}
@@ -270,8 +270,8 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 
 		this.eventGen.launch(this.csvFileName, uLogfilename, -1, true); //Launch threads
 
-		ba=new BatchedFileLogging(uLogfilename, context.getThisComponentId());
-		//jr=new JRedis(this.outSpoutCSVLogFileName);
+		//ba=new BatchedFileLogging(uLogfilename, context.getThisComponentId());
+		jr=new JRedis(this.outSpoutCSVLogFileName);
  		priority = new String[1005];
 		p = 0;
 		try 
