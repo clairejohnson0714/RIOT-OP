@@ -83,7 +83,7 @@ public class SampleSpoutWithData extends BaseRichSpout implements ISyntheticEven
 			LOG.debug("Count1 for {}", values);
 			try {
 //				msgId++;
-				ba.batchLogwriter(System.currentTimeMillis(),"MSGID," + msgId);
+				//ba.batchLogwriter(System.currentTimeMillis(),"MSGID," + msgId);
 				//ba.batchLogwriter(System.nanoTime(),"MSGID," + msgId);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -123,7 +123,7 @@ public class SampleSpoutWithData extends BaseRichSpout implements ISyntheticEven
 		String uLogfilename=this.outSpoutCSVLogFileName+msgId;
 		this.eventGen.launch(this.csvFileName, uLogfilename); //Launch threads
 
-		ba=new BatchedFileLogging(uLogfilename, context.getThisComponentId());
+		//ba=new BatchedFileLogging(uLogfilename, context.getThisComponentId());
 
 
 	}
