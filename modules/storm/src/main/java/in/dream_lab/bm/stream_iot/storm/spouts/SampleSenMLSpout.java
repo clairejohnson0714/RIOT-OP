@@ -274,6 +274,7 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 		jr=new JRedis(this.outSpoutCSVLogFileName);
  		priority = new String[1005];
 		p = 0;
+		/*
 		try 
 		{
 			FileReader reader = new FileReader("/home/cc/storm/riot-bench/modules/tasks/src/main/resources/priority_sys.txt");
@@ -293,6 +294,7 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 	 	{
 			e.printStackTrace();
 	  	}
+		*/
 
 
 	}
