@@ -106,7 +106,7 @@ public class SampleSenMLSpoutTimer extends BaseRichSpout implements ISyntheticEv
 			this._collector.emit(values);
 			try 
 			{
-				ba.batchLogwriter(System.currentTimeMillis(),"MSGID," + msgId);
+				//ba.batchLogwriter(System.currentTimeMillis(),"MSGID," + msgId);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -161,7 +161,7 @@ public class SampleSenMLSpoutTimer extends BaseRichSpout implements ISyntheticEv
 		String uLogfilename=this.outSpoutCSVLogFileName+msgId;
 		this.eventGen.launch(this.csvFileName, uLogfilename, -1, true); //Launch threads
 
-		ba=new BatchedFileLogging(uLogfilename, context.getThisComponentId());
+		//ba=new BatchedFileLogging(uLogfilename, context.getThisComponentId());
 
 
 	}
