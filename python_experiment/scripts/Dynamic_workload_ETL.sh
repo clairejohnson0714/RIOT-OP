@@ -4,7 +4,7 @@ mkdir -p data1
 
 # Function to start the data collection script in the background
 start_data_collection() {
-    python3 perf_priority_taxi.py &
+    python3 perf_priority_taxi_ETL.py &
     data_collection_pid=$!
 
     # Add a loop to flush Redis every 10-15 minutes for 2 hours
