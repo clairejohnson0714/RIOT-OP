@@ -52,7 +52,7 @@ public class IoTPredictionTopologyTAXI {
         Config conf = new Config();
         conf.setDebug(false);
         conf.put("topology.backpressure.enable",true);
-        //conf.setNumWorkers(12);
+        conf.setNumWorkers(2);
 
 
         Properties p_=new Properties();
