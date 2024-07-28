@@ -16,7 +16,7 @@ public class JRedis{
     String appName;
     Jedis jedis;
     Pipeline p;
-    String HOSTNAME="127.0.0.1";  
+    String HOSTNAME="redis";  
     
     public JRedis(){
         this.threshold = GlobalConstants.thresholdFlushToLog; //2000 etc
