@@ -10,7 +10,7 @@ import redis
 
 # step 2: define our connection information for Redis
 # Replaces with your configuration information
-redis_host = "
+redis_host = "redis"
 redis_port = 6379
 redis_password = ""
 
