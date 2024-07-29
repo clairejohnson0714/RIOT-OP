@@ -53,7 +53,7 @@ cd ~/storm/riot-bench/
 
 cd -
 
-#sleep 60
+sleep 30
 
 ${home_path}storm/bin/storm jar $app_path in.dream_lab.bm.stream_iot.storm.topo.apps.${app_name} C ${app_name} $input_name SENML-210 $inputRate $output_path ${home_source}tasks_TAXI.properties test $topologyMap
 
