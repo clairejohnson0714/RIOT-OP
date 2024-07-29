@@ -41,7 +41,7 @@ cd ~/storm/riot-bench/
 
 cd -
 
-#sleep 60
+sleep 30
 
 
 ${home_path}storm/bin/storm jar ${home_path}storm/riot-bench/modules/storm/target/iot-bm-storm-0.1-jar-with-dependencies.jar in.dream_lab.bm.stream_iot.storm.topo.apps.ETLTopology C ETLTopologyTAXI ${home_source}TAXI_sample_data_senml.csv SENML $inputRate   ${home_path}storm/riot-bench/output/    ${home_source}tasks_TAXI.properties  test $topologyMap
