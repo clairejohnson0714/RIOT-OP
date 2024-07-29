@@ -45,6 +45,7 @@ for app in "run_ETL_sys.sh" "run_ETL_taxi.sh"; do
     # Sleep for 1 hour (3600 seconds) to run the application
     for i in {1..60} ;
     	do
+                echo $i
     		# Start the data collection script
     		start_data_collection
 
