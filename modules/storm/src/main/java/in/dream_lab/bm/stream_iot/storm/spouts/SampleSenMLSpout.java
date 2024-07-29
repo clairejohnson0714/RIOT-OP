@@ -85,7 +85,7 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 		Values value ;
 		int priorityval=0;
 		int i=0;
-		int count = 0, MAX_COUNT=150; // FIXME?  For MAX_COUNT 10,20 would produce muliple data at sink
+		int count = 0, MAX_COUNT=100; // FIXME?  For MAX_COUNT 10,20 would produce muliple data at sink
 		
 		while(count < MAX_COUNT) 
 		{
@@ -129,13 +129,10 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 					
 			//l.warn("MSG ID *************"+ msgId );
 			if(priorityval==3){
-				//Add timestamp of this tuple here and add this as ts
-				//ts = System.currentTimeMillis();
-				//l.warn("Time in queue"+ts);
+				
 				value = new Values();
 				value.add(Long.toString(msgId));
 				value.add(newRow);
-				//l.warn("values3 {}",value);
 				values3.add(value);
 				
 				value.add(ts);
@@ -169,78 +166,96 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 				values11.add(value);
 			}
 		}
-		//l.warn("value3 size:"+values3.size());
-		//l.warn("value33 size:"+values33.size());
-		//int size3 = Math.min(values3.size(), values33.size());
-		for ( i = 0; i < values3.size(); i++) 
-		{
-			this._collector.emit(values3.get(i));
-			//l.warn("Emitted Tuple:"+values3.get(i));
-			try {
-				List<Object> element3  = (List<Object>) values33.get(i);
-				if (element3.size() == 3 && element3.get(0) instanceof String && element3.get(2) instanceof Long ) {
-					String values3_msgId = (String) element3.get(0);
-					//l.warn("MSG ID3: " + values3_msgId);
-					Long ts3 = (Long) element3.get(2);
-					//l.warn("Timestamp: " + ts3);
-					
-					//ba.batchLogwriter(ts3, "MSGID," + values3_msgId, String.valueOf(3));
-					jr.batchWriter(ts3, "MSGID_" + values3_msgId, String.valueOf(3));
-				} else {
-					// l.error("Invalid tuple structure: " + tuple);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+		// Modified New Method Logic for paper
 		
-        for (i = 0; i < values2.size(); i++)
-		{    
-			this._collector.emit(values2.get(i));
-			try {
-				//Thread.sleep(1); // Pause for 1 millisecond
-				//l.warn("Emitted Tuple:" + values2.get(i));
-				List<Object> element2 = values22.get(i);
-				if (element2.size() == 3 && element2.get(0) instanceof String && element2.get(2) instanceof Long) {
-					String values2_msgId = (String) element2.get(0);
-					//l.warn("Timestamp: " + values2_msgId);
-					Long ts2 = (Long) element2.get(2);
-					//ba.batchLogwriter(ts2, "MSGID," + values2_msgId, String.valueOf(2));
-					jr.batchWriter(ts2, "MSGID_" + values2_msgId, String.valueOf(2));
-				} else {
-					//l.error("Invalid tuple structure: " + tuple);
-				}
-			} 
-			catch (Exception e) {
-				//l.error("Exception while processing tuple: " + e.getMessage());
-				e.printStackTrace();
-			}
-		}
+		while (!values1.isEmpty() || !values2.isEmpty() || !values3.isEmpty())
+        {
+			int size1 = values1.size();
+			int size2 = values2.size();
+			int size3 = values3.size();
 
-		for (i = 0; i < values1.size(); i++)
-		{
-			this._collector.emit(values1.get(i));
-			try {	
-				//Thread.sleep(2); // Pause for 2 millisecond
-				//l.warn("Emitted Tuple:"+values1.get(i));
-				List<Object> element = values11.get(i);
-					if (element.size() == 3 && element.get(0) instanceof String && element.get(2) instanceof Long) 
-					{
-						String values1_msgId = (String) element.get(0);
-						//l.warn("Timestamp: " + values1_msgId);
-						Long ts1 = (Long) element.get(2);
-						//ba.batchLogwriter(ts1, "MSGID," + values1_msgId, String.valueOf(1));
-						jr.batchWriter(ts1, "MSGID_" + values1_msgId, String.valueOf(1));
-					}else {
-						//l.error("Invalid tuple structure: " + tuple);
+			int minSize = 0;
+
+			// Find the minimum size of non-empty arrays
+			if(size1==0 )
+				size1=MAX_COUNT;
+			if(size2==0)
+				size2=MAX_COUNT;
+			if(size3==0)
+				size3=MAX_COUNT;
+				
+			minSize=Math.min(size1, Math.min(size2, size3));
+			
+			if (minSize > 0) {
+				for (i = 0; i < minSize; i++) 
+				{
+			
+					if (!values3.isEmpty()){
+						this._collector.emit(values3.get(i));
+						//l.warn("Emitted Tuple 3:"+values3.get(i));
+						try {
+							List<Object> element3  = (List<Object>) values33.get(i);
+							if (element3.size() == 3 && element3.get(0) instanceof String && element3.get(2) instanceof Long ) {
+								String values3_msgId = (String) element3.get(0);
+								Long ts3 = (Long) element3.get(2);
+								//ba.batchLogwriter(ts3, "MSGID," + values3_msgId, String.valueOf(3));
+								jr.batchWriter(ts3, "MSGID_" + values3_msgId, String.valueOf(3));
+							} 
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
-			}
-			catch (Exception e) {
-				//l.error("Exception while processing tuple: " + e.getMessage());
-				e.printStackTrace();
-			}
-        }
-	
+				}
+				for (i = 0; i < minSize; i++) 
+				{
+					if (!values2.isEmpty()){
+						this._collector.emit(values2.get(i));
+						//l.warn("Emitted Tuple 2:"+values2.get(i));
+						try {			
+							List<Object> element2 = values22.get(i);
+							if (element2.size() == 3 && element2.get(0) instanceof String && element2.get(2) instanceof Long) {
+								String values2_msgId = (String) element2.get(0);				
+								Long ts2 = (Long) element2.get(2);
+								//ba.batchLogwriter(ts2, "MSGID," + values2_msgId, String.valueOf(2));
+								jr.batchWriter(ts2, "MSGID_" + values2_msgId, String.valueOf(2));
+							} 
+						} 
+						catch (Exception e) {			
+							e.printStackTrace();
+						}
+					}
+				}
+				for (i = 0; i < minSize; i++) 
+				{
+					if (!values1.isEmpty()){
+					this._collector.emit(values1.get(i));
+					//l.warn("Emitted Tuple 1:"+values1.get(i));
+					try {					
+						List<Object> element = values11.get(i);
+							if (element.size() == 3 && element.get(0) instanceof String && element.get(2) instanceof Long) 
+							{
+								String values1_msgId = (String) element.get(0);					
+								Long ts1 = (Long) element.get(2);
+								//ba.batchLogwriter(ts1, "MSGID," + values1_msgId, String.valueOf(1));
+								jr.batchWriter(ts1, "MSGID_" + values1_msgId, String.valueOf(1));
+							}
+					}
+					catch (Exception e) {				
+						e.printStackTrace();
+					}
+					}
+				}	
+		    }
+            // Remove emitted elements from arrays
+            if (!values1.isEmpty()) values1.subList(0, minSize).clear();
+            if (!values2.isEmpty()) values2.subList(0, minSize).clear();
+            if (!values3.isEmpty()) values3.subList(0, minSize).clear();
+			if (!values11.isEmpty()) values11.subList(0, minSize).clear();
+            if (!values22.isEmpty()) values22.subList(0, minSize).clear();
+            if (!values33.isEmpty()) values33.subList(0, minSize).clear();
+    	}
+		
+
 	}
 
 	@Override
@@ -261,41 +276,18 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 		this.eventQueue = new LinkedBlockingQueue<List<String>>();
 		String uLogfilename=this.outSpoutCSVLogFileName+msgId;
 		
-		long waitingToStart = System.currentTimeMillis() % 60000;
-		try{
-			Thread.sleep(waitingToStart);
-		} catch ( Exception e) {
-			e.printStackTrace();
-		}
+		//long waitingToStart = System.currentTimeMillis() % 60000;
+		//try{
+		//	Thread.sleep(waitingToStart);
+		//} catch ( Exception e) {
+		//	e.printStackTrace();
+		//}
 
 		this.eventGen.launch(this.csvFileName, uLogfilename, -1, true); //Launch threads
 
 		//ba=new BatchedFileLogging(uLogfilename, context.getThisComponentId());
 		jr=new JRedis(this.outSpoutCSVLogFileName);
- 		priority = new String[1005];
-		p = 0;
-		/*
-		try 
-		{
-			FileReader reader = new FileReader("/home/cc/storm/riot-bench/modules/tasks/src/main/resources/priority_sys.txt");
-			BufferedReader br = new BufferedReader(reader);
-			String line = br.readLine();
-			while (line != null)   //returns a Boolean value  
-			{  
-				priority[p]=line.replace("\n", "");
-				p++;
-				line = br.readLine();
-				//l.warn("FaizaLine{}",line);
-			} 
-			br.close();
-
-		}   
-		catch(Exception e)
-	 	{
-			e.printStackTrace();
-	  	}
-		*/
-
+ 		
 
 	}
 
