@@ -78,6 +78,10 @@ public abstract class AbstractTask<T, U> implements ITask<T, U> {
 	public float tearDown() {
 		sw.stop();
 		l.debug("finished task tearDown");
+		if (counter == 0)
+		{
+			counter = 1;
+		}
 		return sw.getTime()/counter;
 	}
 	
