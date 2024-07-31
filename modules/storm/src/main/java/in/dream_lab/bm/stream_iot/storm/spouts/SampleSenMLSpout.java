@@ -85,7 +85,7 @@ public class SampleSenMLSpout extends BaseRichSpout implements ISyntheticEventGe
 		Values value ;
 		int priorityval=0;
 		int i=0;
-		int count = 0, MAX_COUNT=200; // FIXME?  For MAX_COUNT 10,20 would produce muliple data at sink
+		int count = 0, MAX_COUNT=100; // FIXME?  For MAX_COUNT 10,20 would produce muliple data at sink
 		
 		while(count < MAX_COUNT) 
 		{
